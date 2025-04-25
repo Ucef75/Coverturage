@@ -1,42 +1,117 @@
 <?php
-$countries = ['Tunisia', 'Algeria', 'Morocco', 'Libya', 'Egypt', 'Mauritania'];
-?>
+session_start();
 
+// Configuration des langues et pays
+$languages = [
+    'en' => ['name' => 'English', 'dir' => 'ltr'],
+    'fr' => ['name' => 'Français', 'dir' => 'ltr'],
+    'ar' => ['name' => 'العربية', 'dir' => 'rtl']
+];
+
+$countries = [
+    'TN' => 'Tunisia',
+    'DZ' => 'Algeria',
+    'MA' => 'Morocco',
+    'LY' => 'Libya',
+    'EG' => 'Egypt',
+    'MR' => 'Mauritania'
+];
+
+// Gestion de la langue
+$selectedLang = 'en';
+if (isset($_GET['lang']) && array_key_exists($_GET['lang'], $languages)) {
+    $selectedLang = $_GET['lang'];
+    $_SESSION['lang'] = $selectedLang;
+} elseif (isset($_SESSION['lang']) && array_key_exists($_SESSION['lang'], $languages)) {
+    $selectedLang = $_SESSION['lang'];
+}
+
+// Gestion du pays
+$selectedCountry = 'TN';
+if (isset($_GET['country']) && array_key_exists($_GET['country'], $countries)) {
+    $selectedCountry = $_GET['country'];
+    $_SESSION['country'] = $selectedCountry;
+} elseif (isset($_SESSION['country']) && array_key_exists($_SESSION['country'], $countries)) {
+    $selectedCountry = $_SESSION['country'];
+}
+
+// Chargement des traductions
+$translations = [];
+$langFile = __DIR__ . '/lang/' . $selectedLang . '.php';
+
+if (file_exists($langFile)) {
+    $translations = include $langFile;
+}
+
+// Fonction helper pour les traductions
+function t($key, $default = '') {
+    global $translations;
+    return $translations[$key] ?? $default;
+}
+
+// Handle form submissions
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['login'])) {
+        header("Location: pages/login.php?lang=$selectedLang");
+        exit();
+    } elseif (isset($_POST['signup'])) {
+        header("Location: pages/signup.php?lang=$selectedLang");
+        exit();
+    }
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($selectedLang) ?>" dir="<?= $languages[$selectedLang]['dir'] ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <title>ForsaDrive</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="css/index.css">
-    <!-- Add these in the head section -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <?php if ($languages[$selectedLang]['dir'] === 'rtl'): ?>
+        <link rel="stylesheet" href="css/rtl.css">
+    <?php endif; ?>
 </head>
 <body>
-<body>
-
     <!-- Header Section -->
     <header id="mainHeader">
         <nav>
             <div class="logo">Forsa<span>Drive</span></div>
+            
             <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#reviews">Reviews</a></li>
                 <li>
                     <select id="countrySelect" class="country-selector">
-                        <?php foreach ($countries as $country): ?>
-                            <option value="<?= $country ?>"><?= $country ?></option>
+                        <?php foreach ($countries as $code => $name): ?>
+                            <option value="<?= htmlspecialchars($code) ?>" <?= $code === $selectedCountry ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($name) ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </li>
-<li><a href="#" class="btn-login" id="loginBtn">Login</a></li>
-<li><a href="#" class="btn-signup" id="signupBtn">Sign Up</a></li>
+                <li>
+                    <select id="languageSelect" class="country-selector">
+                        <?php foreach ($languages as $code => $lang): ?>
+                            <option value="<?= htmlspecialchars($code) ?>" <?= $code === $selectedLang ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($lang['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </li>
+                <li><a href="#home"><?= t('home', 'Home') ?></a></li>
+                <li><a href="#how-it-works"><?= t('how_it_works', 'How It Works') ?></a></li>
+                <li><a href="#reviews"><?= t('reviews_title', 'Reviews') ?></a></li>
+                <li><a href="#contact"><?= t('contact', 'Contact Us') ?></a></li>
+                <li>
+                    <form method="post" style="display: inline;">
+                        <button type="submit" name="login" class="btn-login"><?= t('login', 'Login') ?></button>
+                    </form>
+                </li>
+                <li>
+                    <form method="post" style="display: inline;">
+                        <button type="submit" name="signup" class="btn-signup"><?= t('signup', 'Sign Up') ?></button>
+                    </form>
+                </li>
             </ul>
         </nav>
     </header>
@@ -44,32 +119,32 @@ $countries = ['Tunisia', 'Algeria', 'Morocco', 'Libya', 'Egypt', 'Mauritania'];
     <!-- Home Section -->
     <section id="home" class="section">
         <div class="container">
-            <h1>Welcome to ForsaDrive</h1>
-            <p>Your reliable ride-sharing solution available across the Middle East and North Africa.</p>
-            <p>ForsaDrive is a cutting-edge app that connects drivers and passengers, making transportation more efficient, affordable, and eco-friendly.</p>
+            <h1><?= t('welcome', 'Welcome to ForsaDrive') ?></h1>
+            <p><?= t('slogan', 'Your reliable ride-sharing solution available across the Middle East and North Africa.') ?></p>
+            <p><?= t('description', 'ForsaDrive is a cutting-edge app that connects drivers and passengers, making transportation more efficient, affordable, and eco-friendly.') ?></p>
             
             <div class="stats">
                 <div class="stat-item">
                     <div class="stat-number">$200M+</div>
-                    <div class="stat-label">Company Valuation</div>
+                    <div class="stat-label"><?= t('stats.valuation', 'Company Valuation') ?></div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">$5M+</div>
-                    <div class="stat-label">Annual Revenue</div>
+                    <div class="stat-number">400k</div>
+                    <div class="stat-label"><?= t('stats.rides', 'Daily Rides') ?></div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">6</div>
-                    <div class="stat-label">Countries</div>
+                    <div class="stat-label"><?= t('stats.countries', 'Countries') ?></div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">100K+</div>
-                    <div class="stat-label">Happy Users</div>
+                    <div class="stat-number">15M</div>
+                    <div class="stat-label"><?= t('stats.users', 'Happy Users') ?></div>
                 </div>
             </div>
             
             <div class="download-buttons">
-                <a href="#" class="download-btn"><i class="fab fa-apple"></i> App Store</a>
-                <a href="#" class="download-btn"><i class="fab fa-google-play"></i> Google Play</a>
+                <a href="#" class="download-btn"><i class="fab fa-apple"></i> <?= t('download', 'Download Now') ?></a>
+                <a href="#" class="download-btn"><i class="fab fa-google-play"></i> <?= t('download', 'Download Now') ?></a>
             </div>
         </div>
     </section>
@@ -77,14 +152,11 @@ $countries = ['Tunisia', 'Algeria', 'Morocco', 'Libya', 'Egypt', 'Mauritania'];
     <!-- How It Works Section -->
     <section id="how-it-works" class="section">
         <div class="container">
-            <h2>How It Works</h2>
+            <h2><?= t('how_it_works', 'How It Works') ?></h2>
             <ol class="steps">
-                <li>Download the ForsaDrive app from the App Store or Google Play.</li>
-                <li>Sign up or log in to your account.</li>
-                <li>Enter your desired pickup and drop-off locations.</li>
-                <li>Choose from available drivers and rides at the price set by the driver.</li>
-                <li>Book your ride and make payment (50% upfront).</li>
-                <li>Enjoy your ride!</li>
+                <?php foreach (t('steps', []) as $step): ?>
+                    <li><?= $step ?></li>
+                <?php endforeach; ?>
             </ol>
         </div>
     </section>
@@ -92,50 +164,62 @@ $countries = ['Tunisia', 'Algeria', 'Morocco', 'Libya', 'Egypt', 'Mauritania'];
     <!-- Reviews Section -->
     <section id="reviews" class="section">
         <div class="container">
-            <h2>What Our Users Say</h2>
+            <h2><?= t('reviews_title', 'What Our Users Say') ?></h2>
             <div class="reviews">
-                <div class="review">
-                    <p>"ForsaDrive is a game-changer! Affordable, safe, and easy to use. Highly recommend!"</p>
-                    <p>- Ahmed, Tunisia</p>
-                </div>
-                <div class="review">
-                    <p>"The best way to get around Morocco. Convenient, fast, and great drivers!"</p>
-                    <p>- Fatima, Morocco</p>
-                </div>
-                <div class="review">
-                    <p>"As an international traveler, I love how ForsaDrive operates in so many countries!"</p>
-                    <p>- John, USA</p>
-                </div>
+                <?php 
+                $reviews = t('reviews', []);
+                $reviewers = t('reviewers', []);
+                for ($i = 0; $i < min(3, count($reviews), count($reviewers)); $i++): 
+                ?>
+                    <div class="review">
+                        <p>"<?= $reviews[$i] ?>"</p>
+                        <p>- <?= $reviewers[$i] ?></p>
+                    </div>
+                <?php endfor; ?>
             </div>
         </div>
     </section>
+
+    <!-- Location Section -->
     <section id="location" class="section">
-    <div class="container">
-        <h2>Our Location</h2>
-        <p>Visit our headquarters in Kélibia, Tunisia:</p>
-        <div class="map-container">
-            <div id="map"></div>
+        <div class="container">
+            <h2><?= t('location_title', 'Our Location') ?></h2>
+            <p><?= t('visit_hq', 'Visit our headquarters in Kélibia, Tunisia:') ?></p>
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            <div class="map-info">
+                <p><i class="fas fa-map-marker-alt"></i> <strong><?= t('address', 'Address') ?>:</strong> 8025 Hammam Al Ghezaz, Nabeul, Tunisia</p>
+                <p><i class="fas fa-clock"></i> <strong><?= t('working_hours', 'Working Hours') ?>:</strong> Monday-Friday: 9:00 AM - 2:00 PM</p>
+            </div>
         </div>
-        <div class="map-info">
-            <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong>8025 Hammam Al Ghezaz, Nabeul, Tunisia</p>
-            <p><i class="fas fa-clock"></i> <strong>Working Hours:</strong> Monday-Friday: 9:00 AM - 2:00 PM</p>
-        </div>
-    </div>
-</section>
+    </section>
 
     <!-- Footer Section -->
     <footer>
         <div class="footer-content">
-            <p>&copy; 2025 ForsaDrive | All Rights Reserved</p>
+            <p>&copy; 2025 ForsaDrive | <?= t('all_rights', 'All Rights Reserved') ?></p>
             <div class="credits">
-                <p>Created by Aziz BEN SLIMEN & Youssef BEN ABID</p>
+                <p><?= t('created_by', 'Created by') ?> Aziz BEN SLIMEN & Youssef BEN ABID</p>
                 <div class="contact-info">
-                    <a href="tel:+21626295416"><i class="fas fa-phone"></i> Aziz: 26295416 (+216)</a>
-                    <a href="tel:+21629131170"><i class="fas fa-phone"></i> Youssef: 29131170 (+216)</a>
+                    <a href="tel:+21626295416"><i class="fas fa-phone"></i> 26295416 (+216)</a>
+                    <a href="tel:+21629131170"><i class="fas fa-phone"></i> 29131170 (+216)</a>
                 </div>
             </div>
         </div>
     </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="js/index.js"></script>
+    <script>
+        // Handle country and language selection changes
+        document.getElementById('countrySelect').addEventListener('change', function() {
+            window.location.href = `?country=${this.value}&lang=<?= $selectedLang ?>`;
+        });
+
+        document.getElementById('languageSelect').addEventListener('change', function() {
+            window.location.href = `?lang=${this.value}&country=<?= $selectedCountry ?>`;
+        });
+    </script>
 </body>
 </html>
