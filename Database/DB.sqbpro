@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="DB.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="3483"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="4" parent="0"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="sqlite_sequence" custom_title="0" dock_id="1" table="4,15:mainsqlite_sequence"/><dock_state state="000000ff00000000fd00000001000000020000015c000002aefc0100000001fb000000160064006f0063006b00420072006f007700730065003101000000000000015c0000011800ffffff0000015c0000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="sqlite_sequence" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="39"/><column index="2" value="29"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- Users Table (with bio)
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    bio TEXT,
+    is_driver BOOLEAN DEFAULT 0,
+    is_student BOOLEAN DEFAULT 0,
+    score REAL DEFAULT 5.0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Vehicles Table (simplified with default capacities)
+CREATE TABLE vehicles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    type TEXT CHECK(type IN ('car', 'motobike')) NOT NULL,
+    extras TEXT, -- Comma-separated features like &quot;ac,4x4&quot;
+    seats INTEGER NOT NULL, -- Actual seats available, set by user
+    plate_number TEXT UNIQUE,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Rides Table (No direct reference to 'seats' anymore, logic handled in code)
+CREATE TABLE rides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    driver_id INTEGER NOT NULL,
+    vehicle_id INTEGER NOT NULL,
+    from_location TEXT NOT NULL,
+    to_location TEXT NOT NULL,
+    departure_time DATETIME NOT NULL,
+    price REAL NOT NULL,
+    available_seats INTEGER NOT NULL, -- You manage available_seats in your application logic
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'active', 'completed', 'canceled')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (driver_id) REFERENCES users(id),
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+);
+
+-- Bookings Table
+CREATE TABLE bookings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ride_id INTEGER NOT NULL,
+    passenger_id INTEGER NOT NULL,
+    seats INTEGER NOT NULL,
+    payment_method TEXT NOT NULL CHECK(payment_method IN ('cash', 'app')),
+    paid_amount REAL DEFAULT 0,
+    status TEXT DEFAULT 'confirmed' CHECK(status IN ('confirmed', 'completed', 'canceled')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ride_id) REFERENCES rides(id),
+    FOREIGN KEY (passenger_id) REFERENCES users(id)
+);
+
+-- Ratings Table
+CREATE TABLE ratings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ride_id INTEGER NOT NULL,
+    from_user_id INTEGER NOT NULL,
+    to_user_id INTEGER NOT NULL,
+    score INTEGER NOT NULL CHECK(score BETWEEN 1 AND 5),
+    comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ride_id) REFERENCES rides(id),
+    FOREIGN KEY (from_user_id) REFERENCES users(id),
+    FOREIGN KEY (to_user_id) REFERENCES users(id)
+);
+</sql><current_tab id="0"/></tab_sql></sqlb_project>
