@@ -39,5 +39,9 @@ return [
         'John, USA'
     ],
     'all_rights' => 'All Rights Reserved',
-    'created_by' => 'Created by'
+    'created_by' => 'Created by',
+    'stats.users' => 'Happy Users',
+    'stats.countries' => 'Countries',
+     'stats.rides' => 'Daily Rides',
+     'stats.valuation' => 'Company Valuation',
 ];

@@ -39,5 +39,10 @@ return [
         'John, États-Unis'
     ],
     'all_rights' => 'Tous droits réservés',
-    'created_by' => 'Créé par'
+    'created_by' => 'Créé par',
+    'stats.users' => 'Utilisateurs Heureux',
+'stats.countries' => 'Pays',
+'stats.rides' => 'Trajets Quotidiens',
+'stats.valuation' => 'Évaluation de l\'Entreprise'
+
 ];

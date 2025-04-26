@@ -1,0 +1,39 @@
+<?php
+// Start session and include necessary files
+session_start();
+require_once '../config/config.php';
+require_once '../classes/db.php';
+require_once '../classes/users.php';
+
+$db = new Database();
+$user = new User($db);
+
+// Assume user ID is stored in session after login
+if (isset($_SESSION['user_id'])) {
+    $user->load($_SESSION['user_id']);
+}
+?>
+
+<aside class="sidebar">
+    <div class="profile">
+        <div class="profile-pic">
+            <img src="<?php echo $user->getProfilePicture(); ?>" alt="Profile Picture">
+        </div>
+        <div class="profile-info">
+            <h3><?php echo htmlspecialchars($user->getUsername()); ?></h3>
+            <p><?php echo $user->isDriver() ? 'Driver & Passenger' : 'Passenger'; ?></p>
+        </div>
+    </div>
+    
+    <ul class="nav-menu">
+        <li><a href="index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">
+            <i class="fas fa-home"></i> <span>DASHBOARD</span>
+        </a></li>
+        <li><a href="my_rides.php"><i class="fas fa-car"></i> <span>My Rides</span></a></li>
+        <li><a href="book_ride.php"><i class="fas fa-calendar-alt"></i> <span>Book a Ride</span></a></li>
+        <li><a href="payments.php"><i class="fas fa-wallet"></i> <span>Payments</span></a></li>
+        <li><a href="ratings.php"><i class="fas fa-star"></i> <span>Ratings</span></a></li>
+        <li><a href="settings.php"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+    </ul>
+</aside>

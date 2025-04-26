@@ -143,8 +143,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             
             <div class="download-buttons">
-                <a href="#" class="download-btn"><i class="fab fa-apple"></i> <?= t('download', 'Download Now') ?></a>
-                <a href="#" class="download-btn"><i class="fab fa-google-play"></i> <?= t('download', 'Download Now') ?></a>
+                <a href="https://www.apple.com/" target="_blank" class="download-btn"><i class="fab fa-apple"></i> <?= t('download', 'Download Now') ?></a>
+                <a href="https://play.google.com/store/games?hl=en" target="_blank" class="download-btn"><i class="fab fa-google-play"></i> <?= t('download', 'Download Now') ?></a>
             </div>
         </div>
     </section>
@@ -194,21 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </section>
-
-    <!-- Footer Section -->
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 ForsaDrive | <?= t('all_rights', 'All Rights Reserved') ?></p>
-            <div class="credits">
-                <p><?= t('created_by', 'Created by') ?> Aziz BEN SLIMEN & Youssef BEN ABID</p>
-                <div class="contact-info">
-                    <a href="tel:+21626295416"><i class="fas fa-phone"></i> 26295416 (+216)</a>
-                    <a href="tel:+21629131170"><i class="fas fa-phone"></i> 29131170 (+216)</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
+    <?php require 'include/footer.php'; ?>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="js/index.js"></script>
     <script>
