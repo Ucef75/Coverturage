@@ -8,3 +8,12 @@
     <link rel="stylesheet" href="assets/css/interface.css">
 </head>
 <body>
+<?php
+function t($key, $default = '') {
+    static $translations = [
+        'copyright' => '&copy; 2023 ForsaDrive | All Rights Reserved',
+        'created_by' => 'Created by'
+        // Add other translations here
+    ];
+    return $translations[$key] ?? $default;
+}

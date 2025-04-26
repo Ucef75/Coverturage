@@ -13,4 +13,5 @@ spl_autoload_register(function ($class_name) {
          require_once $file;
      }
  });
+ error_reporting(E_ALL & ~E_DEPRECATED);
 ?>

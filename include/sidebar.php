@@ -1,30 +1,37 @@
 <?php
 // Start session and include necessary files
-session_start();
-require_once '../config/config.php';
-require_once '../classes/db.php';
+require_once '../classes/database.php';
 require_once '../classes/users.php';
+
 
 $db = new Database();
 $user = new User($db);
 
-// Assume user ID is stored in session after login
+// Initialize with default values
+$username = 'Guest';
+$profilePic = 'https://randomuser.me/api/portraits/men/0.jpg';
+$userRole = 'Guest';
+
+// Load user data if logged in
 if (isset($_SESSION['user_id'])) {
-    $user->load($_SESSION['user_id']);
+    if ($user->load($_SESSION['user_id'])) {
+        $username = $user->getUsername() ?? 'User'; // Fallback if username is null
+        $profilePic = $user->getProfilePicture();
+        $userRole = $user->isDriver() ? 'Driver & Passenger' : 'Passenger';
+    }
 }
 ?>
 
 <aside class="sidebar">
     <div class="profile">
         <div class="profile-pic">
-            <img src="<?php echo $user->getProfilePicture(); ?>" alt="Profile Picture">
+            <img src="<?php echo htmlspecialchars($profilePic); ?>" alt="Profile Picture">
         </div>
         <div class="profile-info">
-            <h3><?php echo htmlspecialchars($user->getUsername()); ?></h3>
-            <p><?php echo $user->isDriver() ? 'Driver & Passenger' : 'Passenger'; ?></p>
+            <h3><?php echo htmlspecialchars($username); ?></h3>
+            <p><?php echo htmlspecialchars($userRole); ?></p>
         </div>
     </div>
-    
     <ul class="nav-menu">
         <li><a href="index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">
             <i class="fas fa-home"></i> <span>DASHBOARD</span>

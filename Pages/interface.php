@@ -1,30 +1,45 @@
+<link rel="stylesheet" href="../css/interface.css">
 <?php
-// Define the root directory path
-define('ROOT_PATH', dirname(__DIR__));
-require_once __DIR__ . '/../config.php';
-// Check if files exist before including
+// Start session
+session_start();
+
+// Initialize all variables with default values
+$user = null;
+$ride = null;
+$upcomingRides = [];
+$availableRides = [];
+$completedRides = 0;
+$totalEarnings = 0.00;
+$errorMessage = null;
+
+// Include config file first
+$configFile = '../config.php';
+if (!file_exists($configFile)) {
+    die("Error: Missing config.php file at " . htmlspecialchars($configFile));
+}
+require_once $configFile;
+
+// List of required files with their relative paths from ROOT_PATH
 $required_files = [
     '../include/header.php',
-    '../classes/db.php',
+    '../include/sidebar.php',
+    '../classes/database.php',
+    '../classes/users.php',
     '../classes/rides.php',
-    '../classes/user.php'
 ];
 
+// Check if all required files exist
 foreach ($required_files as $file) {
     if (!file_exists($file)) {
-        die("Error: Missing required file - " . htmlspecialchars($file));
+        die("Error: Missing required file: " . htmlspecialchars($file));
     }
-    require_once $file;
 }
-// Include files using absolute paths
-require_once ROOT_PATH . '/include/header.php';
-require_once ROOT_PATH . '/classes/db.php';
-require_once ROOT_PATH . '/classes/rides.php';
-require_once ROOT_PATH . '/classes/user.php';
 
-// Rest of your code...
+// Include all required files
+require_once '../classes/database.php';
+require_once '../classes/users.php';
+require_once '../classes/rides.php';
 
-// Initialize database connection
 try {
     $db = new Database();
     
@@ -34,23 +49,22 @@ try {
     
     // Verify user is logged in
     if (!isset($_SESSION['user_id'])) {
-        header("Location: login.php");
+        header("Location: ../pages/login.php");
         exit();
     }
-    
-    // Load user data
+
     if (!$user->load($_SESSION['user_id'])) {
         throw new Exception("User not found");
     }
     
     // Get upcoming rides for the user
-    $upcomingRides = $ride->getUpcomingRides($user->getId());
+    $upcomingRides = $ride->getUpcomingRides($user->getId()) ?: [];
     
     // Get available rides in user's region
     $userRegion = $user->getRegion();
-    $availableRides = $ride->getAvailableRides($userRegion);
+    $availableRides = $ride->getAvailableRides($userRegion) ?: [];
     
-    // Calculate stats (would come from database in real app)
+    // Calculate stats
     $completedRides = $user->getCompletedRidesCount();
     $totalEarnings = $user->getTotalEarnings();
 
@@ -59,6 +73,10 @@ try {
     error_log("Error in dashboard: " . $e->getMessage());
     $errorMessage = "An error occurred while loading the dashboard. Please try again later.";
 }
+
+// Include header after processing to prevent header errors
+include '../include/header.php';
+include '../include/sidebar.php';
 ?>
 
 <main class="main-content">
@@ -94,7 +112,7 @@ try {
     <div class="rides-section">
         <div class="section-header">
             <h2>Upcoming Rides</h2>
-            <?php if ($user->isDriver()): ?>
+            <?php if ($user && $user->isDriver()): ?>
                 <button class="btn" onclick="location.href='offer_ride.php'">
                     <i class="fas fa-plus"></i> Offer a Ride
                 </button>
@@ -106,7 +124,7 @@ try {
                 <div class="no-rides">You have no upcoming rides scheduled.</div>
             <?php else: ?>
                 <?php foreach ($upcomingRides as $rideItem): 
-                    $bookedSeats = $ride->getBookedSeats($rideItem['id']);
+                    $bookedSeats = $ride ? $ride->getBookedSeats($rideItem['id']) : 0;
                     try {
                         $departureTime = new DateTime($rideItem['departure_time']);
                     } catch (Exception $e) {
@@ -117,7 +135,7 @@ try {
                         <div class="ride-info">
                             <h4>
                                 <?php echo htmlspecialchars($rideItem['from_location']); ?> to <?php echo htmlspecialchars($rideItem['to_location']); ?>
-                                <?php if ($user->isStudent()): ?>
+                                <?php if ($user && $user->isStudent()): ?>
                                     <span class="student-badge">Student</span>
                                 <?php endif; ?>
                             </h4>
@@ -127,6 +145,7 @@ try {
                                 <i class="fas fa-user-friends"></i> 
                                 <?php echo $bookedSeats; ?>/<?php echo $rideItem['available_seats']; ?> seats booked
                             </p>
+                            <?php if ($ride): ?>
                             <div class="ride-actions">
                                 <button class="btn-sm" onclick="viewRideDetails(<?php echo $rideItem['id']; ?>)">
                                     <i class="fas fa-info-circle"></i> Details
@@ -135,10 +154,11 @@ try {
                                     <i class="fas fa-times"></i> Cancel
                                 </button>
                             </div>
+                            <?php endif; ?>
                         </div>
                         <div class="ride-price">
                             $<?php echo number_format($rideItem['price'], 2); ?>
-                            <?php if ($user->isStudent()): ?>
+                            <?php if ($user && $user->isStudent()): ?>
                                 <div class="student-price">
                                     $<?php echo number_format($rideItem['price'] * 0.5, 2); ?>
                                 </div>
@@ -151,6 +171,7 @@ try {
     </div>
     
     <!-- Available Rides Section -->
+    <?php if ($ride): ?>
     <div class="rides-section" style="margin-top: 30px;">
         <div class="section-header">
             <h2>Available Rides Near You</h2>
@@ -218,6 +239,7 @@ try {
             <?php endif; ?>
         </div>
     </div>
+    <?php endif; ?>
 </main>
 
 <script>
