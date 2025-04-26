@@ -43,8 +43,6 @@ return [
     'stats.users' => 'Utilisateurs Heureux',
 'stats.countries' => 'Pays',
 'stats.rides' => 'Trajets Quotidiens',
-//lacks the other translations
-
 'stats.valuation' => 'Évaluation de l\'Entreprise',
 'your_name' => 'Votre nom',
 'your_email' => 'Votre adresse e-mail',

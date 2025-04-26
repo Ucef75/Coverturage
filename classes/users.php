@@ -44,4 +44,27 @@ class User {
         // In a real app, this would come from the database
         return "https://randomuser.me/api/portraits/men/" . ($this->id % 100) . ".jpg";
     }
+    public function getCompletedRidesCount() {
+        $sql = "SELECT COUNT(*) as count FROM bookings 
+                WHERE passenger_id = " . $this->db->escape($this->getId()) . "
+                AND status = 'completed'";
+        
+        $result = $this->db->query($sql);
+        if ($result === false) {
+            return 0;
+        }
+        return $result->fetch_assoc()['count'];
+    }
+    
+    public function getTotalEarnings() {
+        $sql = "SELECT SUM(price) as total FROM bookings 
+                WHERE driver_id = " . $this->db->escape($this->getId()) . "
+                AND status = 'completed'";
+        
+        $result = $this->db->query($sql);
+        if ($result === false) {
+            return 0.00;
+        }
+        return (float)$result->fetch_assoc()['total'] ?? 0.00;
+    }
 }

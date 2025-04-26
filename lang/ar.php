@@ -45,7 +45,6 @@ return [
 'stats.rides' => 'الرحلات اليومية',
 'stats.valuation' => 'تقييم الشركة',
     'contact_us' => 'اتصل بنا',
-    // do these in fr and ar too
     'your_name' => 'اسمك',
     'your_email' => 'بريدك الإلكتروني',
     'leave_message' => 'رسالتك...',

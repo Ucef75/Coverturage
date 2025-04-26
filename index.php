@@ -107,7 +107,7 @@ function t($key, $default = '') {
                 <li><a href="#home"><?= t('home', 'Home') ?></a></li>
                 <li><a href="#how-it-works"><?= t('how_it_works', 'How It Works') ?></a></li>
                 <li><a href="#reviews"><?= t('reviews_title', 'Reviews') ?></a></li>
-                <li><a href="#contact"><?= t('contact', 'Contact Us') ?></a></li>
+                <li><a href="#location"><?= t('contact', 'Contact Us') ?></a></li>
                 <li>
                     <form method="post" style="display: inline;">
                         <button type="submit" name="login" class="btn-login"><?= t('login', 'Login') ?></button>

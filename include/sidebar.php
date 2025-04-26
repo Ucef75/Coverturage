@@ -9,7 +9,7 @@ $user = new User($db);
 
 // Initialize with default values
 $username = 'Guest';
-$profilePic = 'https://randomuser.me/api/portraits/men/0.jpg';
+$profilePic = '../src/default.jpg';
 $userRole = 'Guest';
 
 // Load user data if logged in
@@ -33,7 +33,7 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
     <ul class="nav-menu">
-        <li><a href="index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">
+        <li><a href="interface.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'interface.php' ? 'active' : ''; ?>">
             <i class="fas fa-home"></i> <span>DASHBOARD</span>
         </a></li>
         <li><a href="my_rides.php"><i class="fas fa-car"></i> <span>My Rides</span></a></li>
@@ -41,6 +41,6 @@ if (isset($_SESSION['user_id'])) {
         <li><a href="payments.php"><i class="fas fa-wallet"></i> <span>Payments</span></a></li>
         <li><a href="ratings.php"><i class="fas fa-star"></i> <span>Ratings</span></a></li>
         <li><a href="settings.php"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+        <li><a href="login.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
     </ul>
 </aside>

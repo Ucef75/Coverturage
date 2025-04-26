@@ -18,7 +18,7 @@ class Ride {
         $sql = "SELECT * FROM rides WHERE id = " . $this->db->escape($rideId);
         $result = $this->db->query($sql);
         
-        if ($result->num_rows > 0) {
+        if ($result && $result->num_rows > 0) {
             $ride = $result->fetch_assoc();
             $this->id = $ride['id'];
             $this->driverId = $ride['driver_id'];
@@ -42,6 +42,10 @@ class Ride {
                 LIMIT 3";
         
         $result = $this->db->query($sql);
+        if ($result === false) {
+            // Log error or handle it appropriately
+            return [];
+        }
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     
@@ -57,6 +61,10 @@ class Ride {
                 LIMIT 5";
         
         $result = $this->db->query($sql);
+        if ($result === false) {
+            // Log error or handle it appropriately
+            return [];
+        }
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     
@@ -66,6 +74,9 @@ class Ride {
                 AND status = 'confirmed'";
         
         $result = $this->db->query($sql);
+        if ($result === false) {
+            return 0;
+        }
         return $result->fetch_assoc()['booked_seats'];
     }
     
