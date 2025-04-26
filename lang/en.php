@@ -44,4 +44,10 @@ return [
     'stats.countries' => 'Countries',
      'stats.rides' => 'Daily Rides',
      'stats.valuation' => 'Company Valuation',
+     'contact_us' => 'Contact Us',
+     // do these in fr and ar too
+'your_name' => 'Your Name',
+'your_email' => 'Your Email',
+'leave_message' => 'Your message...',
+'send_message' => 'Send Message'
 ];

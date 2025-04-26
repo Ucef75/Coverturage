@@ -129,3 +129,52 @@ function animateElements() {
         }
     });
 }
+// Function to validate the contact form
+function validateContactForm() {
+    const form = document.querySelector('.contact-form');  // The contact form
+    const nameInput = form.querySelector('input[name="name"]');
+    const emailInput = form.querySelector('input[name="email"]');
+    const messageInput = form.querySelector('textarea[name="message"]');
+    const submitButton = form.querySelector('.btn-submit');
+
+    // Regular expression for basic email validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+    let valid = true;
+
+    // Check if name is not empty
+    if (nameInput.value.trim() === '') {
+        valid = false;
+        alert('Please enter your name.');
+        nameInput.focus();
+    }
+
+    // Check if email is valid
+    else if (!emailRegex.test(emailInput.value.trim())) {
+        valid = false;
+        alert('Please enter a valid email address.');
+        emailInput.focus();
+    }
+
+    // Check if message is not empty
+    else if (messageInput.value.trim() === '') {
+        valid = false;
+        alert('Please enter your message.');
+        messageInput.focus();
+    }
+
+    // Return validation result
+    return valid;
+}
+
+// Event listener for form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.contact-form');
+
+    form.addEventListener('submit', function(event) {
+        // Call the validateContactForm function when the form is submitted
+        if (!validateContactForm()) {
+            event.preventDefault();  // Prevent form submission if validation fails
+        }
+    });
+});

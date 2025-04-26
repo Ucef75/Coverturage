@@ -49,17 +49,23 @@ function t($key, $default = '') {
     return $translations[$key] ?? $default;
 }
 
-// Handle form submissions
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['login'])) {
-        header("Location: pages/login.php?lang=$selectedLang");
-        exit();
-    } elseif (isset($_POST['signup'])) {
-        header("Location: pages/signup.php?lang=$selectedLang");
-        exit();
-    }
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if (isset($_POST['login'])) {
+            header("Location: pages/login.php?lang=$selectedLang");
+            exit();
+        } elseif (isset($_POST['signup'])) {
+            header("Location: pages/signup.php?lang=$selectedLang");
+            exit();
+        }
 }
 ?>
+    <?php if (isset($_GET['mailsent'])): ?>
+    <div class="alert <?= $_GET['mailsent'] ? 'alert-success' : 'alert-error' ?>">
+        <?= $_GET['mailsent'] ? 
+            t('message_sent', 'Message sent successfully!') : 
+            t('send_error', 'Error sending message. Please try again.') ?>
+    </div>
+<?php endif; ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($selectedLang) ?>" dir="<?= $languages[$selectedLang]['dir'] ?>">
 <head>
@@ -68,9 +74,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>ForsaDrive</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/index.css?v=<?= time() ?>">
     <?php if ($languages[$selectedLang]['dir'] === 'rtl'): ?>
-        <link rel="stylesheet" href="css/rtl.css">
+    <link rel="stylesheet" href="css/rtl.css">
     <?php endif; ?>
 </head>
 <body>
@@ -179,7 +185,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </section>
-
     <!-- Location Section -->
     <section id="location" class="section">
         <div class="container">
@@ -191,6 +196,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="map-info">
                 <p><i class="fas fa-map-marker-alt"></i> <strong><?= t('address', 'Address') ?>:</strong> 8025 Hammam Al Ghezaz, Nabeul, Tunisia</p>
                 <p><i class="fas fa-clock"></i> <strong><?= t('working_hours', 'Working Hours') ?>:</strong> Monday-Friday: 9:00 AM - 2:00 PM</p>
+            </div>
+        </div>
+    </section>
+      <  <!-- Contact Section -->
+        <section id="contact" class="section">
+        <div class="container">
+            <h2><?= t('contact_us', 'Contact Us') ?></h2>
+            <div class="contact-form-container">
+                <form action="server/send_contact.php" method="post" class="contact-form">
+                    <div class="form-group">
+                        <input type="text" name="name" placeholder="<?= t('your_name', 'Your Name') ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="<?= t('your_email', 'Your Email') ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="message" placeholder="<?= t('leave_message', 'Your message...') ?>" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit"><?= t('send_message', 'Send Message') ?></button>
+                </form>
             </div>
         </div>
     </section>
@@ -207,5 +232,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             window.location.href = `?lang=${this.value}&country=<?= $selectedCountry ?>`;
         });
     </script>
+
 </body>
 </html>
