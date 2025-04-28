@@ -48,15 +48,27 @@ try {
     $user = new User($db);
     
     // Verify user is logged in
-/*    if (!isset($_SESSION['user_id'])) {
+    if (!isset($_SESSION['user_id'])) {
         header("Location: ../pages/login.php");
         exit();
     }
 
+    // Check if the session user_id exists and print it for debugging
+    if (!isset($_SESSION['user_id'])) {
+        die('Error: No user_id found in session.');
+    }
+
+    // Show what user ID we are trying to load
+    //echo "Trying to load user ID: ";
+    //var_dump($_SESSION['user_id']);
+    //exit;
+
+    // Try to load the user
     if (!$user->load($_SESSION['user_id'])) {
         throw new Exception("User not found");
     }
-        */
+
+        
     
     // Get upcoming rides for the user
     $upcomingRides = $ride->getUpcomingRides($user->getId()) ?: [];
@@ -71,7 +83,7 @@ $totalEarnings = method_exists($user, 'getTotalEarnings') ? $user->getTotalEarni
 } catch (Exception $e) {
     // Log error and show user-friendly message
     error_log("Error in dashboard: " . $e->getMessage());
-    $errorMessage = "An error occurred while loading the dashboard. Please try again later.";
+    $errorMessage = "Error: " . $e->getMessage();
 }
 
 // Include header after processing to prevent header errors

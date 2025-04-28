@@ -15,11 +15,15 @@ class Ride {
     }
     
     public function load($rideId) {
-        $sql = "SELECT * FROM rides WHERE id = " . $this->db->escape($rideId);
-        $result = $this->db->query($sql);
+        if (empty($rideId)) {
+            return false;
+        }
         
-        if ($result && $result->num_rows > 0) {
-            $ride = $result->fetch_assoc();
+        $sql = "SELECT * FROM rides WHERE id = :rideId";
+        $stmt = $this->db->query($sql, ['rideId' => $rideId]);
+        
+        if ($stmt && $stmt->rowCount() > 0) {
+            $ride = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->id = $ride['id'];
             $this->driverId = $ride['driver_id'];
             $this->fromLocation = $ride['from_location'];
@@ -34,50 +38,61 @@ class Ride {
     }
     
     public function getUpcomingRides($userId) {
+        if (empty($userId)) {
+            return [];
+        }
+        
         $sql = "SELECT r.* FROM rides r 
                 JOIN bookings b ON r.id = b.ride_id 
-                WHERE b.passenger_id = " . $this->db->escape($userId) . "
+                WHERE b.passenger_id = :userId
                 AND r.departure_time > NOW()
                 ORDER BY r.departure_time ASC
                 LIMIT 3";
         
-        $result = $this->db->query($sql);
-        if ($result === false) {
-            // Log error or handle it appropriately
-            return [];
+        $stmt = $this->db->query($sql, ['userId' => $userId]);
+        if ($stmt) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        return $result->fetch_all(MYSQLI_ASSOC);
+        return [];
     }
     
     public function getAvailableRides($region) {
+        if (empty($region)) {
+            return [];
+        }
+        
         $sql = "SELECT r.*, u.username as driver_name, u.score as driver_score 
                 FROM rides r
                 JOIN users u ON r.driver_id = u.id
                 WHERE r.available_seats > 0 
                 AND r.status = 'active'
-                AND u.Region LIKE '%" . $this->db->escape($region) . "%'
+                AND u.Region LIKE :region
                 AND r.departure_time > NOW()
                 ORDER BY r.departure_time ASC
                 LIMIT 5";
         
-        $result = $this->db->query($sql);
-        if ($result === false) {
-            // Log error or handle it appropriately
-            return [];
+        $stmt = $this->db->query($sql, ['region' => "%$region%"]);
+        if ($stmt) {
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        return $result->fetch_all(MYSQLI_ASSOC);
+        return [];
     }
     
     public function getBookedSeats($rideId) {
-        $sql = "SELECT COUNT(*) as booked_seats FROM bookings 
-                WHERE ride_id = " . $this->db->escape($rideId) . "
-                AND status = 'confirmed'";
-        
-        $result = $this->db->query($sql);
-        if ($result === false) {
+        if (empty($rideId)) {
             return 0;
         }
-        return $result->fetch_assoc()['booked_seats'];
+        
+        $sql = "SELECT COUNT(*) as booked_seats FROM bookings 
+                WHERE ride_id = :rideId
+                AND status = 'confirmed'";
+        
+        $stmt = $this->db->query($sql, ['rideId' => $rideId]);
+        if ($stmt) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (int)($row['booked_seats'] ?? 0);
+        }
+        return 0;
     }
     
     // Getters
@@ -90,3 +105,4 @@ class Ride {
     public function getAvailableSeats() { return $this->availableSeats; }
     public function getStatus() { return $this->status; }
 }
+?>

@@ -23,10 +23,13 @@ class Database {
     public function query($sql, $params = []) {
         try {
             $stmt = $this->connection->prepare($sql);
-            $stmt->execute($params);
-            return $stmt;
+            $success = $stmt->execute($params);
+            if (stripos($sql, 'SELECT') === 0) {
+                return $stmt;
+            }
+            return $success;
         } catch (PDOException $e) {
-            error_log("Query error: " . $e->getMessage());
+            die("Query error: " . $e->getMessage()); // <-- show full error
             return false;
         }
     }

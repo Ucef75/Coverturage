@@ -10,26 +10,28 @@ class User {
     private $score;
     
     public function __construct(Database $db) {
-        $this->db = $db;
+        $this->db = $db->getConnection();
     }
     
     public function load($userId) {
-        $sql = "SELECT * FROM users WHERE id = " . $this->db->escape($userId);
-        $result = $this->db->query($sql);
-        
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            $this->id = $user['id'];
-            $this->username = $user['username'];
-            $this->email = $user['email'];
-            $this->isDriver = (bool)$user['is_driver'];
-            $this->isStudent = (bool)$user['is_student'];
-            $this->region = $user['Region'];
-            $this->score = $user['score'];
-            return true;
-        }
-        return false;
+    $sql = "SELECT * FROM users WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$userId]);
+
+    if ($stmt->rowCount() > 0) {
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->id = $user['id'];
+        $this->username = $user['username'];
+        $this->email = $user['email'];
+        $this->isDriver = (bool)$user['is_driver'];
+        $this->isStudent = (bool)$user['is_student'];
+        $this->region = $user['Region'];
+        $this->score = $user['score'];
+        return true;
     }
+    return false;
+}
+
     
     // Getters
     public function getId() { return $this->id; }
@@ -41,30 +43,30 @@ class User {
     public function getScore() { return $this->score; }
     
     public function getProfilePicture() {
-        // In a real app, this would come from the database
         return "https://randomuser.me/api/portraits/men/" . ($this->id % 100) . ".jpg";
     }
+
     public function getCompletedRidesCount() {
         $sql = "SELECT COUNT(*) as count FROM bookings 
-                WHERE passenger_id = " . $this->db->escape($this->getId()) . "
-                AND status = 'completed'";
+                WHERE passenger_id = :passengerId AND status = 'completed'";
         
-        $result = $this->db->query($sql);
-        if ($result === false) {
-            return 0;
-        }
-        return $result->fetch_assoc()['count'];
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':passengerId', $this->id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? (int)$row['count'] : 0;
     }
     
     public function getTotalEarnings() {
         $sql = "SELECT SUM(price) as total FROM bookings 
-                WHERE driver_id = " . $this->db->escape($this->getId()) . "
-                AND status = 'completed'";
+                WHERE driver_id = :driverId AND status = 'completed'";
         
-        $result = $this->db->query($sql);
-        if ($result === false) {
-            return 0.00;
-        }
-        return (float)$result->fetch_assoc()['total'] ?? 0.00;
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':driverId', $this->id, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? (float)$row['total'] : 0.00;
     }
 }
