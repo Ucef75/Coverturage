@@ -1,23 +1,41 @@
 <?php
 // Start session and include necessary files
 require_once '../classes/database.php';
-require_once '../classes/users.php';
-
-
-$db = new Database();
-$user = new User($db);
+require_once '../classes/users.php'; // Make sure this matches your actual file name
 
 // Initialize with default values
 $username = 'Guest';
 $profilePic = '../src/default.jpg';
 $userRole = 'Guest';
 
-// Load user data if logged in
+// Only try to load user if session exists
 if (isset($_SESSION['user_id'])) {
-    if ($user->load($_SESSION['user_id'])) {
-        $username = $user->getUsername() ?? 'User'; // Fallback if username is null
-        $profilePic = $user->getProfilePicture();
-        $userRole = $user->isDriver() ? 'Driver & Passenger' : 'Passenger';
+    try {
+        $db = new Database();
+        $user = new User($db);
+        
+        if ($user->load($_SESSION['user_id'])) {
+            // Set username with fallback
+            $username = $user->getUsername() ?? 'User';
+            
+            // Set profile picture
+            //$profilePic = $user->getProfilePicture();
+            
+            // Determine user role
+            $roles = [];
+            if ($user->isStudent()) {
+                $roles[] = 'Student';
+            }
+            if ($user->isDriver()) {
+                $roles[] = 'Driver';
+            }
+            $roles[] = 'Passenger'; // Always a passenger
+            
+            $userRole = implode(' & ', array_unique($roles));
+        }
+    } catch (Exception $e) {
+        error_log("Error loading user in sidebar: " . $e->getMessage());
+        // Keep default values if there's an error
     }
 }
 ?>

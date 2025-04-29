@@ -1,7 +1,5 @@
-<link rel="stylesheet" href="../css/interface.css">
 <?php
-// Start session
-session_start();
+require_once '../server/session.php';
 
 // Initialize all variables with default values
 $user = null;
@@ -37,10 +35,11 @@ foreach ($required_files as $file) {
 
 // Include all required files
 require_once '../classes/database.php';
-require_once '../classes/users.php';
+require_once '../classes/users.php';  // Changed from users.php to user.php to match your class file
 require_once '../classes/rides.php';
 
 try {
+    // Initialize database connection
     $db = new Database();
     
     // Initialize objects
@@ -53,37 +52,42 @@ try {
         exit();
     }
 
-    // Check if the session user_id exists and print it for debugging
-    if (!isset($_SESSION['user_id'])) {
-        die('Error: No user_id found in session.');
-    }
-
-    // Show what user ID we are trying to load
-    //echo "Trying to load user ID: ";
-    //var_dump($_SESSION['user_id']);
-    //exit;
-
-    // Try to load the user
-    if (!$user->load($_SESSION['user_id'])) {
-        throw new Exception("User not found");
-    }
-
-        
+    // Debugging: Output session user_id
+    // echo "Session User ID: " . $_SESSION['user_id']; // Uncomment for debugging
     
-    // Get upcoming rides for the user
-    $upcomingRides = $ride->getUpcomingRides($user->getId()) ?: [];
+    // Load the user
+    $userId = $_SESSION['user_id'];
+    if (!$user->load($userId)) {
+        throw new Exception("User with ID $userId not found");
+    }
+    
+    // Debugging: Output user information
+    /*
+    echo "<pre>";
+    echo "User Loaded:\n";
+    echo "ID: " . $user->getId() . "\n";
+    echo "Username: " . $user->getUsername() . "\n";
+    echo "Email: " . $user->getEmail() . "\n";
+    echo "Is Driver: " . ($user->isDriver() ? 'Yes' : 'No') . "\n";
+    echo "Is Student: " . ($user->isStudent() ? 'Yes' : 'No') . "\n";
+    echo "Region: " . $user->getRegion() . "\n";
+    echo "Score: " . $user->getScore() . "\n";
+    echo "</pre>";
+    */    // Get upcoming rides for the user
+    //$upcomingRides = $ride->getUpcomingRides($user->getId()) ?: [];
     
     // Get available rides in user's region
     $userRegion = $user->getRegion();
     $availableRides = $ride->getAvailableRides($userRegion) ?: [];
     
-    // Calculate stats - with fallbacks if methods don't exist
-$completedRides = method_exists($user, 'getCompletedRidesCount') ? $user->getCompletedRidesCount() : 0;
-$totalEarnings = method_exists($user, 'getTotalEarnings') ? $user->getTotalEarnings() : 0.00;
+    // Calculate stats
+    //$completedRides = $user->getCompletedRidesCount();
+    //$totalEarnings = $user->getTotalEarnings();
+    
 } catch (Exception $e) {
     // Log error and show user-friendly message
     error_log("Error in dashboard: " . $e->getMessage());
-    $errorMessage = "Error: " . $e->getMessage();
+    $errorMessage = "We encountered an error loading your data. Please try again later.";
 }
 
 // Include header after processing to prevent header errors

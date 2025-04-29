@@ -5,7 +5,7 @@ class Database {
     
     public function __construct() {
         // Set path to your SQLite database file
-        $this->dbPath = '../database/DB.db';
+        $this->dbPath = '../Database/DB.db';
         $this->connect();
     }
     

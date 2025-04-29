@@ -1,65 +1,24 @@
 <?php
-session_start();
+require_once 'server/session.php';
 
-// Configuration des langues et pays
-$languages = [
-    'en' => ['name' => 'English', 'dir' => 'ltr'],
-    'fr' => ['name' => 'Français', 'dir' => 'ltr'],
-    'ar' => ['name' => 'العربية', 'dir' => 'rtl']
-];
+// Make the variables available in current scope
+$selectedLang = $GLOBALS['selectedLang'];
+$selectedCountry = $GLOBALS['selectedCountry'];
+$languages = $GLOBALS['languages'];
+$countries = $GLOBALS['countries'];
 
-$countries = [
-    'TN' => 'Tunisia',
-    'DZ' => 'Algeria',
-    'MA' => 'Morocco',
-    'LY' => 'Libya',
-    'EG' => 'Egypt',
-    'MR' => 'Mauritania'
-];
-
-// Gestion de la langue
-$selectedLang = 'en';
-if (isset($_GET['lang']) && array_key_exists($_GET['lang'], $languages)) {
-    $selectedLang = $_GET['lang'];
-    $_SESSION['lang'] = $selectedLang;
-} elseif (isset($_SESSION['lang']) && array_key_exists($_SESSION['lang'], $languages)) {
-    $selectedLang = $_SESSION['lang'];
-}
-
-// Gestion du pays
-$selectedCountry = 'TN';
-if (isset($_GET['country']) && array_key_exists($_GET['country'], $countries)) {
-    $selectedCountry = $_GET['country'];
-    $_SESSION['country'] = $selectedCountry;
-} elseif (isset($_SESSION['country']) && array_key_exists($_SESSION['country'], $countries)) {
-    $selectedCountry = $_SESSION['country'];
-}
-
-// Chargement des traductions
-$translations = [];
-$langFile = __DIR__ . '/lang/' . $selectedLang . '.php';
-
-if (file_exists($langFile)) {
-    $translations = include $langFile;
-}
-
-// Fonction helper pour les traductions
-function t($key, $default = '') {
-    global $translations;
-    return $translations[$key] ?? $default;
-}
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['login'])) {
-            header("Location: pages/login.php?lang=$selectedLang");
-            exit();
-        } elseif (isset($_POST['signup'])) {
-            header("Location: pages/signup.php?lang=$selectedLang");
-            exit();
-        }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['login'])) {
+        header("Location: pages/login.php");
+        exit();
+    } elseif (isset($_POST['signup'])) {
+        header("Location: pages/signup.php");
+        exit();
+    }
 }
 ?>
-    <?php if (isset($_GET['mailsent'])): ?>
+
+<?php if (isset($_GET['mailsent'])): ?>
     <div class="alert <?= $_GET['mailsent'] ? 'alert-success' : 'alert-error' ?>">
         <?= $_GET['mailsent'] ? 
             t('message_sent', 'Message sent successfully!') : 
