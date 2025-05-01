@@ -1,46 +1,62 @@
 <?php
 // server/session.php
-session_start();
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/database.php';
 
-// Available languages configuration
-$GLOBALS['languages'] = [
-    'en' => ['name' => 'English', 'dir' => 'ltr'],
-    'fr' => ['name' => 'Français', 'dir' => 'ltr'],
-    'ar' => ['name' => 'العربية', 'dir' => 'rtl']
-];
-
-// Available countries configuration
-$GLOBALS['countries'] = [
-    'TN' => 'Tunisia',
-    'DZ' => 'Algeria',
-    'MA' => 'Morocco',
-    'LY' => 'Libya',
-    'EG' => 'Egypt',
-    'MR' => 'Mauritania'
-];
-
-// Initialize language (GET > SESSION > default)
-if (isset($_GET['lang']) && isset($GLOBALS['languages'][$_GET['lang']])) {
-    $_SESSION['lang'] = $_GET['lang'];
-}
-$GLOBALS['selectedLang'] = $_SESSION['lang'] ?? 'en';
-
-// Initialize country (GET > SESSION > default)
-if (isset($_GET['country']) && isset($GLOBALS['countries'][$_GET['country']])) {
-    $_SESSION['country'] = $_GET['country'];
-}
-$GLOBALS['selectedCountry'] = $_SESSION['country'] ?? 'TN';
-
-// Load translations
-$GLOBALS['translations'] = [];
-$langFile = __DIR__ . '/../lang/' . $GLOBALS['selectedLang'] . '.php';
-if (file_exists($langFile)) {
-    $GLOBALS['translations'] = include $langFile;
-} else {
-    $GLOBALS['translations'] = include __DIR__ . '/../lang/en.php';
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Translation helper function
-function t($key, $default = '') {
-    return $GLOBALS['translations'][$key] ?? $default;
+// Initialize empty user if not set
+if (!isset($_SESSION['user'])) {
+    $_SESSION['user'] = null;
+}
+
+// Initialize database connection if not exists
+if (!isset($GLOBALS['db'])) {
+    $GLOBALS['db'] = new Database();
+}
+
+/**
+ * Check if user is logged in
+ */
+function isLoggedIn(): bool {
+    return $_SESSION['user'] !== null;
+}
+
+/**
+ * Get current user data
+ */
+function getCurrentUser(): ?array {
+    return $_SESSION['user'];
+}
+
+/**
+ * Login user and set session data
+ */
+function loginUser(array $userData): void {
+    $_SESSION['user'] = [
+        'id' => $userData['id'],
+        'username' => $userData['username'],
+        'email' => $userData['email'],
+        'is_driver' => (bool)($userData['is_driver'] ?? false),
+        'is_student' => (bool)($userData['is_student'] ?? false),
+        'region' => $userData['region'] ?? 'TN'
+    ];
+}
+
+/**
+ * Logout user and destroy session
+ */
+function logoutUser(): void {
+    $_SESSION['user'] = null;
+    session_destroy();
+}
+
+/**
+ * Get database connection
+ */
+function getDB(): Database {
+    return $GLOBALS['db'];
 }

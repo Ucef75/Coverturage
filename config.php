@@ -14,4 +14,5 @@ spl_autoload_register(function ($class_name) {
      }
  });
  error_reporting(E_ALL & ~E_DEPRECATED);
+ ini_set('memory_limit', '128M');
 ?>

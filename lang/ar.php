@@ -48,6 +48,52 @@ return [
     'your_name' => 'اسمك',
     'your_email' => 'بريدك الإلكتروني',
     'leave_message' => 'رسالتك...',
-    'send_message' => 'إرسال الرسالة'
+    'send_message' => 'إرسال الرسالة',
+
+    'auth' => [
+        // Existing translations
+        'signup_title' => 'إنشاء حساب',
+        'signup_heading' => 'انضم إلى مجتمعنا',
+        'username' => 'اسم المستخدم',
+        'email' => 'البريد الإلكتروني',
+        'password' => 'كلمة المرور',
+        'confirm_password' => 'تأكيد كلمة المرور',
+        'signup_button' => 'التسجيل',
+        'already_account' => 'هل لديك حساب بالفعل؟',
+        'login_here' => 'سجل الدخول هنا',
+        
+        // New error messages
+        'username_required' => 'اسم المستخدم مطلوب',
+        'valid_email_required' => 'البريد الإلكتروني الصحيح مطلوب',
+        'password_required' => 'كلمة المرور مطلوبة',
+        'passwords_must_match' => 'يجب أن تتطابق كلمات المرور',
+        'email_exists' => 'البريد الإلكتروني أو اسم المستخدم موجود بالفعل',
+        'registration_failed' => 'فشل التسجيل. يرجى المحاولة مرة أخرى.',
+        'region_required' => 'المنطقة مطلوبة'
+    ],    
+     'dashboard' => [
+        'upcoming_rides' => 'الرحلات القادمة',
+        'completed_rides' => 'الرحلات المكتملة',
+        'total_earnings' => 'إجمالي الأرباح',
+        'no_upcoming_rides' => 'ليس لديك أي رحلات قادمة.',
+        'available_rides' => 'الرحلات المتاحة بالقرب منك',
+        'no_available_rides' => 'لا توجد رحلات متاحة في منطقتك حالياً.',
+        'offer_ride' => 'عرض رحلة',
+        'filters' => 'تصفية',
+        'refresh' => 'تحديث',
+        'details' => 'التفاصيل',
+        'cancel' => 'إلغاء',
+        'book_now' => 'حجز الآن',
+        'student_badge' => 'طالب',
+        'student_discount' => 'خصم طالب',
+        'seats_booked' => 'مقاعد محجوزة',
+        'seats_left' => 'مقاعد متبقية',
+        'departure' => 'مغادرة',
+        'vehicle' => 'مركبة',
+        'driver' => 'سائق',
+        'price' => 'السعر',
+        'student_price' => 'سعر الطالب'
+    ],
+    'date_format' => 'D، j M، g:i A'
 
 ];

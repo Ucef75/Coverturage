@@ -48,5 +48,50 @@ return [
 'your_email' => 'Votre adresse e-mail',
 'leave_message' => 'Votre message...',
 'send_message' => 'Envoyer le message',
+'auth' => [
+    'signup_title' => 'Créer un compte',
+        'signup_heading' => 'Rejoignez notre communauté',
+        'username' => 'Nom d\'utilisateur',
+        'email' => 'E-mail',
+        'password' => 'Mot de passe',
+        'confirm_password' => 'Confirmer le mot de passe',
+        'signup_button' => 'S\'inscrire',
+        'already_account' => 'Vous avez déjà un compte?',
+        'login_here' => 'Connectez-vous ici',
+        
+        // New error messages
+        'username_required' => 'Le nom d\'utilisateur est requis',
+        'valid_email_required' => 'Un email valide est requis',
+        'password_required' => 'Le mot de passe est requis',
+        'passwords_must_match' => 'Les mots de passe doivent correspondre',
+        'email_exists' => 'L\'email ou le nom d\'utilisateur existe déjà',
+        'registration_failed' => 'L\'enregistrement a échoué. Veuillez réessayer.',
+        'region_required' => 'La région est requise'
+],
+
+'dashboard' => [
+    'upcoming_rides' => 'Trajets à venir',
+    'completed_rides' => 'Trajets complétés',
+    'total_earnings' => 'Gains totaux',
+    'no_upcoming_rides' => 'Vous n\'avez aucun trajet prévu.',
+    'available_rides' => 'Trajets disponibles près de chez vous',
+    'no_available_rides' => 'Aucun trajet disponible dans votre région pour le moment.',
+    'offer_ride' => 'Proposer un trajet',
+    'filters' => 'Filtres',
+    'refresh' => 'Actualiser',
+    'details' => 'Détails',
+    'cancel' => 'Annuler',
+    'book_now' => 'Réserver',
+    'student_badge' => 'Étudiant',
+    'student_discount' => 'Réduction étudiant',
+    'seats_booked' => 'places réservées',
+    'seats_left' => 'places disponibles',
+    'departure' => 'Départ',
+    'vehicle' => 'Véhicule',
+    'driver' => 'Conducteur',
+    'price' => 'Prix',
+    'student_price' => 'Prix étudiant'
+],
+'date_format' => 'D, j M, G:i' // French date format (e.g., "Lun, 5 Juin, 14:30")
 
 ];

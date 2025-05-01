@@ -1,12 +1,10 @@
 <?php
 require_once '../server/session.php';
-
-// 1. Include database connection
 require_once '../classes/database.php';
-$db = new Database();
-$pdo = $db->getConnection();
+require_once '../config.php';
+require_once '../server/language.php';
 
-// 2. Handle login
+$db = new Database();
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -22,28 +20,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $db->query("SELECT * FROM users WHERE email = ?", [$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user) {
-            if (password_verify($password, $user['password'])) {
-                // Set all user session data
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['is_driver'] = (bool)$user['is_driver'];
-                $_SESSION['is_student'] = (bool)$user['is_student'];
-                $_SESSION['region'] = $user['region'];
+            if ($user && password_verify($password, $user['password'])) {
+                // Use the session login function
+                loginUser([
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                    'is_driver' => $user['is_driver'],
+                    'region' => $user['region']
+                ]);
                 
-                // Redirect to interface (no need for lang/country in URL - they're in session)
                 header("Location: interface.php");
                 exit();
             } else {
-                $errors[] = t('auth.incorrect_password', 'Incorrect password');
+                // Generic error message to prevent user enumeration
+                $errors[] = t('auth.incorrect_credentials', 'Invalid email or password');
             }
-        } else {
-            $errors[] = t('auth.email_not_found', 'Email not found');
+        } catch (PDOException $e) {
+            error_log("Login error: " . $e->getMessage());
+            $errors[] = t('auth.login_error', 'Login failed. Please try again.');
         }
     }
 }

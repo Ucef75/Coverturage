@@ -1,5 +1,5 @@
 <?php
-require_once 'server/session.php';
+require_once 'server/language.php';
 
 // Make the variables available in current scope
 $selectedLang = $GLOBALS['selectedLang'];
@@ -9,10 +9,10 @@ $countries = $GLOBALS['countries'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['login'])) {
-        header("Location: pages/login.php");
+        header("Location: pages/login.php?lang=$selectedLang&country=$selectedCountry");
         exit();
     } elseif (isset($_POST['signup'])) {
-        header("Location: pages/signup.php");
+        header("Location: pages/signup.php?lang=$selectedLang&country=$selectedCountry");
         exit();
     }
 }
@@ -182,7 +182,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="js/index.js"></script>
     <script>
-        // Handle country and language selection changes
         document.getElementById('countrySelect').addEventListener('change', function() {
             window.location.href = `?country=${this.value}&lang=<?= $selectedLang ?>`;
         });

@@ -55,29 +55,7 @@ class Ride {
         }
         return [];
     }
-    
-    public function getAvailableRides($region) {
-        if (empty($region)) {
-            return [];
-        }
-        
-        $sql = "SELECT r.*, u.username as driver_name, u.score as driver_score 
-                FROM rides r
-                JOIN users u ON r.driver_id = u.id
-                WHERE r.available_seats > 0 
-                AND r.status = 'active'
-                AND u.Region LIKE :region
-                AND r.departure_time > NOW()
-                ORDER BY r.departure_time ASC
-                LIMIT 5";
-        
-        $stmt = $this->db->query($sql, ['region' => "%$region%"]);
-        if ($stmt) {
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-        return [];
-    }
-    
+
     public function getBookedSeats($rideId) {
         if (empty($rideId)) {
             return 0;
