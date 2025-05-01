@@ -95,5 +95,12 @@ return [
         'price' => 'Price',
         'student_price' => 'Student Price'
     ],
-    'date_format' => 'D, M j, g:i A'
+    'date_format' => 'D, M j, g:i A',
+    'dashboard' => 'Dashboard',
+    'my_rides' => 'My Rides',
+    'book_ride' => 'Book a Ride',
+    'payments' => 'Payments',
+    'ratings' => 'Ratings',
+    'settings' => 'Settings',
+    'logout' => 'Logout'
 ];

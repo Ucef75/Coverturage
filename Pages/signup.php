@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
     $confirm_password = trim($_POST['confirm_password'] ?? '');
-    $region = trim($_POST['region'] ?? 'TN'); // ✅ Get region from POST, default Tunisia
+    $region = trim($_POST['region'] ?? 'TN'); 
 
     // Validation
     if (empty($username)) {
@@ -44,9 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Insert the new user
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            // ✅ Insert username, email, password, bio, and region
-            $insertSql = "INSERT INTO users (username, email, password, bio, region) VALUES (?, ?, ?, ?, ?)";
-            $insertResult = $db->query($insertSql, [$username, $email, $hashedPassword, ' ', $region]);
+            $insertSql = "INSERT INTO users (username, email, password, region) VALUES (?, ?, ?, ?)";
+            $insertResult = $db->query($insertSql, [$username, $email, $hashedPassword, $region]);
 
             if ($insertResult) {
                 header('Location: login.php');

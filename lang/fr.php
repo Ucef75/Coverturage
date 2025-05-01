@@ -92,6 +92,13 @@ return [
     'price' => 'Prix',
     'student_price' => 'Prix étudiant'
 ],
-'date_format' => 'D, j M, G:i' // French date format (e.g., "Lun, 5 Juin, 14:30")
+'date_format' => 'D, j M, G:i', 
+'dashboard' => 'Tableau de bord',
+    'my_rides' => 'Mes trajets',
+    'book_ride' => 'Réserver un trajet',
+    'payments' => 'Paiements',
+    'ratings' => 'Évaluations',
+    'settings' => 'Paramètres',
+    'logout' => 'Déconnexion',
 
 ];

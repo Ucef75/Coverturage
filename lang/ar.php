@@ -94,6 +94,13 @@ return [
         'price' => 'السعر',
         'student_price' => 'سعر الطالب'
     ],
-    'date_format' => 'D، j M، g:i A'
+    'date_format' => 'D، j M، g:i A',
+    'dashboard' => 'لوحة التحكم',
+    'my_rides' => 'رحلاتي',
+    'book_ride' => 'حجز رحلة',
+    'payments' => 'المدفوعات',
+    'ratings' => 'التقييمات',
+    'settings' => 'الإعدادات',
+    'logout' => 'تسجيل الخروج'
 
 ];

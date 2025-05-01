@@ -1,0 +1,204 @@
+/* CSS Variables - Just sidebar-related ones */
+:root {
+    /* Core Colors */
+    --primary: #1e3a5f;
+    --primary-light: #2c5282;
+    --primary-dark: #0f2942;
+    --secondary: #2980b9;
+    --secondary-light: #3498db;
+    --light: #f5f7fa;
+    --text-white: #ffffff;
+    --text-muted: #bdc3c7;
+    
+    /* Layout */
+    --sidebar-width: 280px;
+    --transition-speed: 0.3s;
+    
+    /* Shadows */
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.07);
+    
+    /* Font Sizes */
+    --font-xs: 0.75rem;    /* 12px */
+    --font-sm: 0.875rem;   /* 14px */
+    --font-md: 1.125rem;   /* 18px */
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--text-white);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 25px 20px;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    transition: all var(--transition-speed);
+    overflow-y: auto;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    overflow: hidden;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    transition: all var(--transition-speed);
+}
+
+.profile-pic:hover {
+    transform: scale(1.05);
+    border-color: var(--secondary-light);
+}
+
+.profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-info h3 {
+    font-size: var(--font-md);
+    margin-bottom: 5px;
+    color: var(--text-white);
+    font-weight: 600;
+}
+
+.profile-info p {
+    font-size: var(--font-sm);
+    opacity: 0.85;
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+/* Navigation */
+.nav-menu {
+    list-style: none;
+    margin-top: 10px;
+}
+
+.nav-menu li {
+    margin-bottom: 4px;
+}
+
+.nav-menu a {
+    color: var(--text-white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all var(--transition-speed);
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-menu a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: var(--secondary-light);
+    transform: scaleY(0);
+    transition: transform 0.2s;
+}
+
+.nav-menu a:hover, .nav-menu a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding-left: 20px;
+}
+
+.nav-menu a.active {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.nav-menu a.active::before {
+    transform: scaleY(1);
+}
+
+.nav-menu i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    font-size: var(--font-md);
+    transition: all var(--transition-speed);
+}
+
+.nav-menu a:hover i {
+    color: var(--secondary-light);
+}
+
+.nav-category {
+    font-size: var(--font-xs);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin: 25px 0 10px 15px;
+    font-weight: 600;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 0px;
+    }
+    
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+        width: 250px;
+    }
+    
+    .hamburger-menu {
+        display: block;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 200;
+        background-color: var(--primary);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow-md);
+    }
+}

@@ -3,6 +3,7 @@ require_once '../server/session.php';
 require_once '../classes/database.php';
 require_once '../config.php';
 require_once '../server/language.php';
+require_once '../classes/users.php';
 
 $db = new Database();
 $errors = [];
@@ -21,25 +22,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         try {
-            $stmt = $db->query("SELECT * FROM users WHERE email = ?", [$email]);
+            // First get just the ID and password for verification
+            $stmt = $db->query("SELECT id, password, username, email, is_driver, region FROM users WHERE email = ?", [$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($user && password_verify($password, $user['password'])) {
-                // Use the session login function
                 loginUser([
                     'id' => $user['id'],
                     'username' => $user['username'],
                     'email' => $user['email'],
-                    'is_driver' => $user['is_driver'],
+                    'is_driver' => (bool)$user['is_driver'],
                     'region' => $user['region']
                 ]);
                 
                 header("Location: interface.php");
                 exit();
-            } else {
-                // Generic error message to prevent user enumeration
-                $errors[] = t('auth.incorrect_credentials', 'Invalid email or password');
             }
+            
+            $errors[] = t('auth.incorrect_credentials', 'Invalid email or password');
+            
         } catch (PDOException $e) {
             error_log("Login error: " . $e->getMessage());
             $errors[] = t('auth.login_error', 'Login failed. Please try again.');
@@ -78,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="">
+    <form method="POST" action="">        
         <input type="email" name="email" placeholder="<?= htmlspecialchars(t('auth.email', 'Email')) ?>" required value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
         
         <input type="password" name="password" placeholder="<?= htmlspecialchars(t('auth.password', 'Password')) ?>" required>

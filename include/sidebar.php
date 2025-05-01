@@ -38,7 +38,7 @@ if (isLoggedIn()) {
     }
 }
 ?>
-
+<link rel="stylesheet" href="../css/sidebar.css">
 <aside class="sidebar">
     <div class="profile">
         <div class="profile-pic">
@@ -68,7 +68,7 @@ if (isLoggedIn()) {
         <li><a href="<?php echo addLangAndCountryToUrl('settings.php'); ?>">
             <i class="fas fa-cog"></i> <span><?php echo t('settings', 'Settings'); ?></span>
         </a></li>
-        <li><a href="<?php echo addLangAndCountryToUrl('logout.php'); ?>">
+        <li><a href="<?php echo addLangAndCountryToUrl('../index.php'); ?>">
             <i class="fas fa-sign-out-alt"></i> <span><?php echo t('logout', 'Logout'); ?></span>
         </a></li>
     </ul>
