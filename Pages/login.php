@@ -22,18 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         try {
-            // First get just the ID and password for verification
-            $stmt = $db->query("SELECT id, password, username, email, is_driver, region FROM users WHERE email = ?", [$email]);
+            // Use prepared statement properly
+            $stmt = $db->getConnection()->prepare("SELECT id, password, username, email, is_driver, region FROM users WHERE email = ?");
+            $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
             if ($user && password_verify($password, $user['password'])) {
-                loginUser([
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'email' => $user['email'],
-                    'is_driver' => (bool)$user['is_driver'],
-                    'region' => $user['region']
-                ]);
+                // Create a User object instead of using array
+                $userObj = new User($db->getConnection());
+                $userObj->setId($user['id']);
+                $userObj->setUsername($user['username']);
+                $userObj->setEmail($user['email']);
+                $userObj->setIsDriver((bool)$user['is_driver']);
+                $userObj->setRegion($user['region']);
+                
+                loginUser($userObj);
                 
                 header("Location: interface.php");
                 exit();

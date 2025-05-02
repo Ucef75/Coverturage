@@ -1,6 +1,6 @@
 <?php
 // Include the centralized session management first
-require_once '../server/session.php';
+require_once __DIR__ . '/../server/session.php';
 
 // Error reporting (disable in production)
 error_reporting(E_ALL);
@@ -16,10 +16,10 @@ $errorMessage = null;
 
 // Verify required files exist
 $requiredFiles = [
-    '../config.php',
-    '../classes/rides.php',
-    '../include/header.php',
-    '../include/sidebar.php'
+    __DIR__ . '/../config.php',
+    __DIR__ . '/../classes/rides.php',
+    __DIR__ . '/../include/header.php',
+    __DIR__ . '/../include/sidebar.php'
 ];
 
 foreach ($requiredFiles as $file) {
@@ -29,8 +29,8 @@ foreach ($requiredFiles as $file) {
 }
 
 // Include all required files
-require_once '../config.php';
-require_once '../classes/rides.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/rides.php';
 
 try {
     // Get services from session
@@ -47,11 +47,12 @@ try {
     $ride = new Ride($db);
     
     // Get user data from session
-    $userData = $_SESSION['user'];
+    $userData = $_SESSION['user_data']; // Changed from $_SESSION['user']
     $userRegion = $userData['region'] ?? 'TN'; // Default to Tunisia
     
     // Get rides data
-    //$availableRides = $ride->getAvailableRides($userRegion) ?: [];
+   // $availableRides = $ride->getAvailableRides($userRegion) ?: [];
+    //$upcomingRides = $ride->getUpcomingRides($userData['id']) ?: []; // Added this line
     //$completedRides = $ride->getCompletedRidesCount($userData['id']);
     
 } catch (PDOException $e) {
@@ -63,8 +64,8 @@ try {
 }
 
 // Include UI components
-include '../include/header.php';
-include '../include/sidebar.php';
+include __DIR__ . '/../include/header.php';
+include __DIR__ . '/../include/sidebar.php';
 ?>
 
 <main class="main-content">
@@ -96,7 +97,7 @@ include '../include/sidebar.php';
     <div class="rides-section">
         <div class="section-header">
             <h2><?php echo t('upcoming_rides', 'Upcoming Rides'); ?></h2>
-            <?php if ($user && !empty($user['is_driver'])): ?>
+            <?php if ($user && isset($userData['is_driver']) && $userData['is_driver']): ?>
                 <button class="btn" onclick="location.href='<?php echo addLangAndCountryToUrl('offer_ride.php'); ?>'">
                     <i class="fas fa-plus"></i> <?php echo t('offer_ride', 'Offer a Ride'); ?>
                 </button>
@@ -108,7 +109,7 @@ include '../include/sidebar.php';
                 <div class="no-rides"><?php echo t('no_upcoming_rides', 'You have no upcoming rides scheduled.'); ?></div>
             <?php else: ?>
                 <?php foreach ($upcomingRides as $rideItem): 
-                    $bookedSeats = $ride ? $ride->getBookedSeats($rideItem['id']) : 0;
+                    $bookedSeats = $ride->getBookedSeats($rideItem['id']);
                     try {
                         $departureTime = new DateTime($rideItem['departure_time']);
                     } catch (Exception $e) {
@@ -119,7 +120,7 @@ include '../include/sidebar.php';
                         <div class="ride-info">
                             <h4>
                                 <?php echo htmlspecialchars($rideItem['from_location']); ?> <?php echo t('to', 'to'); ?> <?php echo htmlspecialchars($rideItem['to_location']); ?>
-                                <?php if ($user && !empty($user['is_student'])): ?>
+                                <?php if ($user && isset($userData['is_student']) && $userData['is_student']): ?>
                                     <span class="student-badge"><?php echo t('student', 'Student'); ?></span>
                                 <?php endif; ?>
                             </h4>
@@ -129,7 +130,6 @@ include '../include/sidebar.php';
                                 <i class="fas fa-user-friends"></i> 
                                 <?php echo $bookedSeats; ?>/<?php echo $rideItem['available_seats']; ?> <?php echo t('seats_booked', 'seats booked'); ?>
                             </p>
-                            <?php if ($ride): ?>
                             <div class="ride-actions">
                                 <button class="btn-sm" onclick="viewRideDetails(<?php echo $rideItem['id']; ?>)">
                                     <i class="fas fa-info-circle"></i> <?php echo t('details', 'Details'); ?>
@@ -138,11 +138,10 @@ include '../include/sidebar.php';
                                     <i class="fas fa-times"></i> <?php echo t('cancel', 'Cancel'); ?>
                                 </button>
                             </div>
-                            <?php endif; ?>
                         </div>
                         <div class="ride-price">
                             $<?php echo number_format($rideItem['price'], 2); ?>
-                            <?php if ($user && $user->isStudent()): ?>
+                            <?php if ($user && isset($userData['is_student']) && $userData['is_student']): ?>
                                 <div class="student-price">
                                     $<?php echo number_format($rideItem['price'] * 0.5, 2); ?>
                                 </div>
@@ -155,7 +154,6 @@ include '../include/sidebar.php';
     </div>
     
     <!-- Available Rides Section -->
-    <?php if ($ride): ?>
     <div class="rides-section" style="margin-top: 30px;">
         <div class="section-header">
             <h2><?php echo t('available_rides', 'Available Rides Near You'); ?></h2>
@@ -223,7 +221,6 @@ include '../include/sidebar.php';
             <?php endif; ?>
         </div>
     </div>
-    <?php endif; ?>
 </main>
 
 <script>

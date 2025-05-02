@@ -1,43 +1,32 @@
 <?php
-// Include the centralized session file
 require_once '../server/session.php';
 require_once '../server/language.php';
 
-// Initialize with default values
+// Valeurs par défaut
 $username = 'Guest';
 $profilePic = '../src/default.jpg';
 $userRole = 'Guest';
 
-// Use the currentUser from our session system
-if (isLoggedIn()) {
-    try {
-        $user = getCurrentUser();
+// Vérifie la connexion
+if (isLoggedIn() && isset($_SESSION['user_data'])) {
+    $userData = $_SESSION['user_data'];
 
-        $username = $user['username'] ?? 'User';
-        $profilePic = $user['profile_picture'] ?? '../src/default.jpg';
+    $username = $userData['username'] ?? 'User';
+    $profilePic = $userData['profile_picture'] ?? '../src/default.jpg';
 
-        // Handle roles safely
-        $roles = [];
-        if (isset($user['is_student']) && $user['is_student']) {
-            $roles[] = 'Student';
-        }
-        if (isset($user['is_driver']) && $user['is_driver']) {
-            $roles[] = 'Driver';
-        }
-        $roles[] = 'Passenger'; // Default role for all users
-
-        // Safely implode roles
-        $userRole = !empty($roles) ? implode(' & ', $roles) : 'Passenger';
-
-    } catch (Exception $e) {
-        error_log("Error loading user in sidebar: " . $e->getMessage());
-        // Fallback values
-        $username = 'User';
-        $profilePic = '../src/default.jpg';
-        $userRole = 'Passenger';
+    $roles = [];
+    if (!empty($userData['is_student'])) {
+        $roles[] = 'Student';
     }
+    if (!empty($userData['is_driver'])) {
+        $roles[] = 'Driver';
+    }
+
+    $roles[] = 'Passenger'; // Rôle par défaut
+    $userRole = implode(' & ', $roles);
 }
 ?>
+
 <link rel="stylesheet" href="../css/sidebar.css">
 <aside class="sidebar">
     <div class="profile">

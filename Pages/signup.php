@@ -34,25 +34,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Check if email or username already exists
-        $checkSql = "SELECT id FROM users WHERE email = ? OR username = ? LIMIT 1";
-        $checkResult = $db->query($checkSql, [$email, $username]);
-
-        if ($checkResult && ($existingUser = $checkResult->fetch(PDO::FETCH_ASSOC))) {
-            $errors[] = $lang['auth']['email_exists'] ?? 'Email or Username already exists';
-        } else {
-            // Insert the new user
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            $insertSql = "INSERT INTO users (username, email, password, region) VALUES (?, ?, ?, ?)";
-            $insertResult = $db->query($insertSql, [$username, $email, $hashedPassword, $region]);
-
-            if ($insertResult) {
-                header('Location: login.php');
-                exit();
+        try {
+            // Check if email or username already exists
+            $checkSql = "SELECT id FROM users WHERE email = ? OR username = ? LIMIT 1";
+            $checkStmt = $db->getConnection()->prepare($checkSql);
+            $checkStmt->execute([$email, $username]);
+            
+            if ($checkStmt->rowCount() > 0) {
+                $errors[] = $lang['auth']['email_exists'] ?? 'Email or Username already exists';
             } else {
-                $errors[] = $lang['auth']['registration_failed'] ?? 'Registration failed. Please try again.';
+                // Insert the new user
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    
+                $insertSql = "INSERT INTO users (username, email, password, region) VALUES (?, ?, ?, ?)";
+                $insertStmt = $db->getConnection()->prepare($insertSql);
+                $insertResult = $insertStmt->execute([$username, $email, $hashedPassword, $region]);
+    
+                if ($insertResult) {
+                    header('Location: login.php');
+                    exit();
+                } else {
+                    $errors[] = $lang['auth']['registration_failed'] ?? 'Registration failed. Please try again.';
+                }
             }
+        } catch (PDOException $e) {
+            error_log("Registration error: " . $e->getMessage());
+            $errors[] = $lang['auth']['registration_error'] ?? 'An error occurred during registration.';
         }
     }
 }

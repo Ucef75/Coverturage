@@ -1,0 +1,304 @@
+/* Payments Page Styles */
+.main-content {
+     margin-left: var(--sidebar-width);
+     padding: 30px;
+     min-height: 100vh;
+     background-color: #f5f7fa;
+     transition: margin var(--transition-speed);
+ }
+ 
+ .container {
+     max-width: 1200px;
+     margin: 0 auto;
+ }
+ 
+ .page-title {
+     font-size: 2rem;
+     margin-bottom: 30px;
+     color: var(--primary-dark);
+ }
+ 
+ /* Balance Card */
+ .balance-card {
+     background: white;
+     border-radius: 12px;
+     padding: 25px;
+     margin-bottom: 30px;
+     box-shadow: var(--shadow-md);
+ }
+ 
+ .balance-header {
+     display: flex;
+     align-items: center;
+     margin-bottom: 20px;
+ }
+ 
+ .balance-header i {
+     font-size: 1.5rem;
+     color: var(--secondary);
+     margin-right: 15px;
+ }
+ 
+ .balance-header h2 {
+     font-size: 1.25rem;
+     margin: 0;
+     color: var(--primary-dark);
+ }
+ 
+ .balance-amount {
+     margin-bottom: 25px;
+ }
+ 
+ .balance-amount .amount {
+     font-size: 2.5rem;
+     font-weight: 700;
+     color: var(--primary);
+ }
+ 
+ .balance-amount .currency {
+     font-size: 1.5rem;
+     color: var(--text-muted);
+     margin-left: 10px;
+ }
+ 
+ .balance-actions {
+     display: flex;
+     gap: 15px;
+ }
+ 
+ .btn {
+     padding: 10px 20px;
+     border-radius: 8px;
+     font-weight: 500;
+     cursor: pointer;
+     transition: all var(--transition-speed);
+     display: inline-flex;
+     align-items: center;
+     gap: 8px;
+ }
+ 
+ .btn-primary {
+     background-color: var(--secondary);
+     color: white;
+     border: none;
+ }
+ 
+ .btn-primary:hover {
+     background-color: var(--secondary-light);
+ }
+ 
+ .btn-outline {
+     background-color: transparent;
+     color: var(--secondary);
+     border: 1px solid var(--secondary);
+ }
+ 
+ .btn-outline:hover {
+     background-color: rgba(41, 128, 185, 0.1);
+ }
+ 
+ /* Payment History */
+ .payment-history {
+     background: white;
+     border-radius: 12px;
+     padding: 25px;
+     box-shadow: var(--shadow-md);
+ }
+ 
+ .section-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: 20px;
+ }
+ 
+ .section-header h2 {
+     font-size: 1.25rem;
+     margin: 0;
+     color: var(--primary-dark);
+ }
+ 
+ .form-select {
+     padding: 8px 12px;
+     border-radius: 6px;
+     border: 1px solid #ddd;
+     background-color: white;
+     font-size: 0.9rem;
+ }
+ 
+ /* Transactions List */
+ .empty-state {
+     text-align: center;
+     padding: 40px 20px;
+     color: var(--text-muted);
+ }
+ 
+ .empty-state i {
+     font-size: 2.5rem;
+     margin-bottom: 15px;
+     opacity: 0.5;
+ }
+ 
+ .transactions-list {
+     display: flex;
+     flex-direction: column;
+     gap: 12px;
+ }
+ 
+ .transaction-item {
+     display: flex;
+     align-items: center;
+     padding: 15px;
+     border-radius: 8px;
+     background-color: #f9f9f9;
+     transition: all var(--transition-speed);
+ }
+ 
+ .transaction-item:hover {
+     background-color: #f0f0f0;
+ }
+ 
+ .transaction-icon {
+     width: 40px;
+     height: 40px;
+     border-radius: 50%;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     margin-right: 15px;
+     font-size: 1rem;
+ }
+ 
+ .transaction-item.incoming .transaction-icon {
+     background-color: rgba(46, 204, 113, 0.1);
+     color: #2ecc71;
+ }
+ 
+ .transaction-item.outgoing .transaction-icon {
+     background-color: rgba(231, 76, 60, 0.1);
+     color: #e74c3c;
+ }
+ 
+ .transaction-details {
+     flex: 1;
+ }
+ 
+ .transaction-details h3 {
+     font-size: 1rem;
+     margin: 0 0 5px 0;
+     color: var(--primary-dark);
+ }
+ 
+ .transaction-date {
+     font-size: 0.8rem;
+     color: var(--text-muted);
+     margin: 0;
+ }
+ 
+ .transaction-amount {
+     font-weight: 600;
+ }
+ 
+ .transaction-item.incoming .transaction-amount {
+     color: #2ecc71;
+ }
+ 
+ .transaction-item.outgoing .transaction-amount {
+     color: #e74c3c;
+ }
+ 
+ /* Responsive */
+ @media (max-width: 768px) {
+     .main-content {
+         margin-left: 0;
+         padding: 20px;
+     }
+     
+     .balance-actions {
+         flex-direction: column;
+     }
+     
+     .section-header {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 10px;
+     }
+ }
+ .add-funds-form {
+     margin-top: 25px;
+     padding-top: 20px;
+     border-top: 1px solid rgba(0, 0, 0, 0.05);
+ }
+ 
+ .form-group {
+     margin-bottom: 15px;
+ }
+ 
+ .form-group label {
+     display: block;
+     margin-bottom: 8px;
+     font-weight: 500;
+     color: var(--primary-dark);
+ }
+ 
+ .input-group {
+     display: flex;
+     margin-bottom: 15px;
+ }
+ 
+ .input-group-text {
+     padding: 10px 15px;
+     background-color: #f0f0f0;
+     border: 1px solid #ddd;
+     border-right: none;
+     border-radius: 6px 0 0 6px;
+     font-weight: 500;
+ }
+ 
+ .add-funds-form input[type="number"] {
+     flex: 1;
+     padding: 10px 15px;
+     border: 1px solid #ddd;
+     border-radius: 0 6px 6px 0;
+     font-size: 1rem;
+ }
+ 
+ /* Transaction Types */
+ .ride-badge {
+     display: inline-block;
+     background-color: rgba(52, 152, 219, 0.1);
+     color: var(--secondary);
+     padding: 2px 8px;
+     border-radius: 4px;
+     font-size: 0.7rem;
+     margin-left: 8px;
+     font-weight: 500;
+ }
+ 
+ .transaction-item.ride .transaction-icon {
+     background-color: rgba(52, 152, 219, 0.1);
+     color: var(--secondary);
+ }
+ 
+ /* Responsive adjustments */
+ @media (max-width: 768px) {
+     .add-funds-form {
+         margin-top: 20px;
+     }
+     
+     .input-group {
+         flex-direction: column;
+     }
+     
+     .input-group-text {
+         border-radius: 6px 6px 0 0;
+         border-right: 1px solid #ddd;
+         border-bottom: none;
+         justify-content: center;
+     }
+     
+     .add-funds-form input[type="number"] {
+         border-radius: 0 0 6px 6px;
+         border-top: none;
+     }
+ }

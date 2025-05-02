@@ -2,7 +2,7 @@
 require_once '../server/session.php';
 require_once '../classes/users.php';
 
-if (!isset($_SESSION['user_id'])) {
+if (!isLoggedIn()) {
     header('Location: ../index.php');
     exit();
 }
@@ -17,7 +17,7 @@ if (!$currentUser) {
         if ($currentUser->load($_SESSION['user_id'])) {
             // Successfully reloaded user
         } else {
-            // If still failing, just create a basic user object with session data
+            // If still failing, create a basic user object with session data
             $currentUser = new User($db);
             $currentUser->setId($_SESSION['user_id']);
             $currentUser->setUsername($_SESSION['user_data']['username'] ?? '');
@@ -45,21 +45,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($errors)) {
             if ($currentUser->updateProfile($name, $region)) {
                 $success = "Profile updated successfully!";
-                $currentUser->load($currentUser->getId()); // Refresh data
+                refreshUserInSession($currentUser);
             } else {
                 $errors[] = "Failed to update profile";
             }
         }
     } elseif (isset($_POST['change_password'])) {
-        // Change password
-        $current_password = $_POST['current_password'];
-        $new_password = $_POST['new_password'];
-        $confirm_password = $_POST['confirm_password'];
+        $current_password = $_POST['current_password'] ?? '';
+        $new_password = $_POST['new_password'] ?? '';
+        $confirm_password = $_POST['confirm_password'] ?? '';
         
         // Validate inputs
         if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
             $errors[] = "All password fields are required";
-        } elseif (!password_verify($current_password, $userData['password'])) {
+        } elseif (!$currentUser->verifyPassword($current_password)) {
             $errors[] = "Current password is incorrect";
         } elseif ($new_password !== $confirm_password) {
             $errors[] = "New passwords do not match";
@@ -70,24 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         if (empty($errors)) {
-            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $sql = "UPDATE users SET password = ? WHERE id = ?";
-            
-            if ($db->query($sql, [$hashed_password, $currentUser->getId()])) {
+            if ($currentUser->changePassword($current_password, $new_password)) {
                 $success = "Password changed successfully!";
+                refreshUserInSession($currentUser);
             } else {
                 $errors[] = "Failed to change password";
             }
         }
     } elseif (isset($_POST['delete_account'])) {
-        // Delete account
         $confirm = $_POST['confirm_delete'] ?? false;
         
         if ($confirm) {
-            $sql = "DELETE FROM users WHERE id = ?";
-            if ($db->query($sql, [$currentUser->getId()])) {
+            if ($currentUser->deleteAccount()) {
                 // Logout and redirect
-                session_destroy();
+                logoutUser();
                 header('Location: ../index.php?account_deleted=1');
                 exit();
             } else {
@@ -222,7 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-
     <script>
         // Password toggle functionality
         function setupPasswordToggle(inputId, toggleId) {
