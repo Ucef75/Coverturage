@@ -100,5 +100,20 @@ return [
     'ratings' => 'Évaluations',
     'settings' => 'Paramètres',
     'logout' => 'Déconnexion',
+    'ride' => 'Trajet',
+    'title' => 'Paiements',
+    'your_balance' => 'Votre Solde',
+    'amount' => 'Montant',
+    'amount_placeholder' => 'Entrez le montant',
+    'add_funds' => 'Ajouter des Fonds',
+    'transaction_history' => 'Historique des Transactions',
+    'no_transactions' => 'Aucune transaction pour le moment',
+    'ride' => 'Trajet',
+    'deposit' => 'Dépôt',
+    'payment' => 'Paiement',
+    'withdrawal' => 'Retrait',
+    'insufficient_funds' => 'Fonds insuffisants',
+    'add_success' => 'Fonds ajoutés avec succès',
+    'add_error' => 'Erreur lors de l\'ajout de fonds'
 
 ];

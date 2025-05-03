@@ -102,5 +102,18 @@ return [
     'payments' => 'Payments',
     'ratings' => 'Ratings',
     'settings' => 'Settings',
-    'logout' => 'Logout'
+    'title' => 'Payments',
+    'your_balance' => 'Your Balance',
+    'amount' => 'Amount',
+    'amount_placeholder' => 'Enter amount',
+    'add_funds' => 'Add Funds',
+    'transaction_history' => 'Transaction History',
+    'no_transactions' => 'No transactions yet',
+    'ride' => 'Ride',
+    'deposit' => 'Deposit',
+    'payment' => 'Payment',
+    'withdrawal' => 'Withdrawal',
+    'insufficient_funds' => 'Insufficient funds',
+    'add_success' => 'Funds added successfully',
+    'add_error' => 'Error adding funds'
 ];

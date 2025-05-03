@@ -15,15 +15,15 @@ if (isLoggedIn() && isset($_SESSION['user_data'])) {
     $profilePic = $userData['profile_picture'] ?? '../src/default.jpg';
 
     $roles = [];
-    if (!empty($userData['is_student'])) {
-        $roles[] = 'Student';
-    }
-    if (!empty($userData['is_driver'])) {
-        $roles[] = 'Driver';
-    }
+if (!empty($userData['is_student'])) {
+    $roles[] = t('roles.student', 'Student');
+}
+if (!empty($userData['is_driver'])) {
+    $roles[] = t('roles.driver', 'Driver');
+}
 
-    $roles[] = 'Passenger'; // Rôle par défaut
-    $userRole = implode(' & ', $roles);
+$roles[] = t('roles.passenger', 'Passenger'); // Default role
+$userRole = implode(' & ', $roles);
 }
 ?>
 
