@@ -34,11 +34,7 @@ try {
             
             if ($isDriver) {
                 $rideEarnings = $rides->getDriverEarnings($userId);
-                $paymentHistory = array_merge($paymentHistory, $rideEarnings);
-            }
-            
-            usort($paymentHistory, fn($a, $b) => strtotime($b['created_at']) - strtotime($a['created_at']));
-            
+            }            
             $region = $user->getRegion();
             $currency = match($region) {
                 'DZ' => 'DZD', 'MA' => 'MAD', 'LY' => 'LYD',
