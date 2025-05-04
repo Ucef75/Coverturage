@@ -157,7 +157,6 @@
  .profile-pic {
      width: 60px;
      height: 60px;
-     border-radius: 50%;
      background-color: var(--light);
      display: flex;
      align-items: center;
@@ -555,6 +554,13 @@
      gap: 10px;
  }
  
+ #profile-preview{
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+ }
  /* Alerts */
  .alert {
      padding: 16px;

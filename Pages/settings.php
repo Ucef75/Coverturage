@@ -91,8 +91,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $errors[] = "You must confirm account deletion";
         }
+    } } elseif (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+        $allowed = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif'
+        ];
+        
+        $fileType = $_FILES['profile_picture']['type'];
+        $fileSize = $_FILES['profile_picture']['size'];
+        
+        if (!isset($allowed[$fileType])) {
+            $errors[] = "Invalid file type";
+        } elseif ($fileSize > 2 * 1024 * 1024) {
+            $errors[] = "File too large (max 2MB)";
+        } else {
+            $uploadDir = '../src/';
+            $filename = 'profile_' . $currentUser->getId() . '.' . $allowed[$fileType];
+            $targetPath = $uploadDir . $filename;
+            
+            if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetPath)) {
+                // Verify file was actually written
+                if (!file_exists($targetPath)) {
+                    $errors[] = "File upload failed";
+                } else {
+                    $currentUser->setProfilePicture($filename);
+                    if (!$currentUser->saveProfilePicture()) {
+                        $errors[] = "Database update failed";
+                        unlink($targetPath); // Clean up
+                    } else {
+                        $success = "Profile picture updated!";
+                        refreshUserInSession($currentUser);
+                    }
+                }
+            } else {
+                $errors[] = "Error moving uploaded file";
+            }
+        }
     }
-}
+
 ?>
 
 <!DOCTYPE html>
@@ -136,8 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="settings-card">
                     <h2><i class="fas fa-user"></i> Profile Information</h2>
                     
-                    <form action="settings.php" method="POST">
-                        <div class="form-group">
+                    <form action="settings.php" method="POST" enctype="multipart/form-data">                        <div class="form-group">
                             <label for="name">Full Name</label>
                             <input type="text" id="name" name="name" class="form-control" 
                                    value="<?php echo htmlspecialchars($currentUser->getUsername()); ?>" required>
@@ -149,12 +185,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    value="<?php echo htmlspecialchars($currentUser->getRegion()); ?>" 
                                    placeholder="Your country or city">
                         </div>
+                        <div class="form-group">
+    <label for="profile_picture">Profile Picture</label>
+    <div class="form-group">
+        <img src="<?= htmlspecialchars($currentUser->getProfilePicture() ?? '../src/default.jpg') ?>" 
+             alt="Profile Picture" id="profile-preview" class="profile-pic">
+        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="profile-picture-input">
+    </div>
+</div>
                         
                         <button type="submit" name="update_profile" class="btn btn-success">
                             <i class="fas fa-save"></i> Save Changes
                         </button>
                     </form>
+                    
                 </div>
+                
                 
                 <!-- Security Section -->
                 <div class="settings-card">
@@ -195,6 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </form>
                     
                     <hr class="section-divider">
+                    
                     
                     <div class="danger-zone">
                         <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>

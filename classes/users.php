@@ -9,6 +9,7 @@ class User {
     private $score;
     private $balance;
     private $password;
+    private $picture;
     private $db;
 
     public function __construct(PDO $db) {
@@ -20,7 +21,7 @@ class User {
             $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
             $stmt->execute([$userId]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
             if ($user) {
                 $this->id = $user['id'];
                 $this->username = $user['username'];
@@ -28,88 +29,87 @@ class User {
                 $this->password = $user['password'];
                 $this->isDriver = (bool)$user['is_driver'];
                 $this->isStudent = (bool)$user['is_student'];
+                
+                // Handle case-sensitive region column
                 $this->region = $user['Region'] ?? $user['region'] ?? '';
-                $this->score = $user['score'] ?? 5.0;
-                $this->balance = (float)$user['Balance'] ?? (float)$user['balance'] ?? 0.0;
+                
+                // Handle numeric values with defaults
+                $this->score = (float)($user['score'] ?? 5.0);
+                
+                // Handle case-sensitive balance column
+                $this->balance = (float)($user['balance'] ?? 0.0);
+                
+                // Add profile picture support (new)
+                $this->picture = $user['picture'] ?? null;
+                
                 return true;
             }
             return false;
         } catch (PDOException $e) {
-            error_log("Error loading user: " . $e->getMessage());
+            error_log("Error loading user #$userId: " . $e->getMessage());
             return false;
         }
     }
 
     // Balance management functions
-    public function getBalance(): float {
-        return $this->balance;
-    }
-
     public function addBalance(float $amount): bool {
         if ($amount <= 0) {
+            error_log("Invalid amount: $amount");
             return false;
         }
-
+    
         try {
             $this->db->beginTransaction();
             
-            // Get current balance
-            $stmt = $this->db->prepare("SELECT Balance FROM users WHERE id = ? FOR UPDATE");
+            // Use exact column name "Balance" as in your table
+            $stmt = $this->db->prepare("SELECT \"Balance\" FROM users WHERE id = ? FOR UPDATE");
             $stmt->execute([$this->id]);
             $currentBalance = (float)$stmt->fetchColumn();
             
-            // Update balance
+            if ($currentBalance === false) {
+                $this->db->rollBack();
+                error_log("User not found: {$this->id}");
+                return false;
+            }
+            
             $newBalance = $currentBalance + $amount;
-            $updateStmt = $this->db->prepare("UPDATE users SET Balance = ? WHERE id = ?");
+            
+            // Use exact column name "Balance" here too
+            $updateStmt = $this->db->prepare("UPDATE users SET \"Balance\" = ? WHERE id = ?");
             $success = $updateStmt->execute([$newBalance, $this->id]);
             
-            if ($success) {
-                $this->balance = $newBalance;
+            if ($success && $updateStmt->rowCount() > 0) {
                 $this->db->commit();
+                $this->balance = $newBalance;
                 return true;
             }
             
             $this->db->rollBack();
+            error_log("Update failed for user {$this->id}");
             return false;
+            
         } catch (PDOException $e) {
             $this->db->rollBack();
-            error_log("Error adding balance: " . $e->getMessage());
+            error_log("Database error: " . $e->getMessage());
             return false;
         }
     }
 
     public function deductBalance(float $amount): bool {
-        if ($amount <= 0) {
-            return false;
-        }
+        if ($amount <= 0) return false;
 
         try {
             $this->db->beginTransaction();
-            
-            // Get current balance
             $stmt = $this->db->prepare("SELECT Balance FROM users WHERE id = ? FOR UPDATE");
             $stmt->execute([$this->id]);
             $currentBalance = (float)$stmt->fetchColumn();
-            
-            // Check if sufficient balance
+
             if ($currentBalance < $amount) {
                 $this->db->rollBack();
                 return false;
             }
-            
-            // Update balance
-            $newBalance = $currentBalance - $amount;
-            $updateStmt = $this->db->prepare("UPDATE users SET Balance = ? WHERE id = ?");
-            $success = $updateStmt->execute([$newBalance, $this->id]);
-            
-            if ($success) {
-                $this->balance = $newBalance;
-                $this->db->commit();
-                return true;
-            }
-            
-            $this->db->rollBack();
-            return false;
+
+            return $this->updateBalance(-$amount);
         } catch (PDOException $e) {
             $this->db->rollBack();
             error_log("Error deducting balance: " . $e->getMessage());
@@ -118,31 +118,16 @@ class User {
     }
 
     public function transferBalance(float $amount, User $recipient): bool {
-        if ($amount <= 0 || $this->id === $recipient->getId()) {
-            return false;
-        }
+        if ($amount <= 0 || $this->id === $recipient->getId()) return false;
 
         try {
             $this->db->beginTransaction();
             
-            // Verify recipient exists
-            if (!$recipient->load($recipient->getId())) {
+            if (!$recipient->load($recipient->getId()) || !$this->deductBalance($amount) || !$recipient->addBalance($amount)) {
                 $this->db->rollBack();
                 return false;
             }
-            
-            // Deduct from sender
-            if (!$this->deductBalance($amount)) {
-                $this->db->rollBack();
-                return false;
-            }
-            
-            // Add to recipient
-            if (!$recipient->addBalance($amount)) {
-                $this->db->rollBack();
-                return false;
-            }
-            
+
             $this->db->commit();
             return true;
         } catch (PDOException $e) {
@@ -152,8 +137,12 @@ class User {
         }
     }
 
-    // Existing methods (unchanged except for toArray)
+    // Profile update functions
     public function updateProfile(string $username, string $region): bool {
+        return $this->updateUserInfo($username, $region);
+    }
+
+    private function updateUserInfo(string $username, string $region): bool {
         try {
             $stmt = $this->db->prepare("UPDATE users SET username = ?, region = ? WHERE id = ?");
             $success = $stmt->execute([$username, $region, $this->id]);
@@ -200,8 +189,20 @@ class User {
             return false;
         }
     }
+    public function getProfilePicture(): ?string {
+        return $this->picture;
+    }
+    
+    public function setProfilePicture(string $path): void {
+        $this->picture = $path;
+    }
+    public function saveProfilePicture(): bool {
+        $stmt = $this->db->prepare("UPDATE users SET picture = ? WHERE id = ?");
+        return $stmt->execute([$this->profilePicture, $this->id]);
+    }
+    
 
-    // Setters
+    // Setters and Getters
     public function setId(int $id): void { $this->id = $id; }
     public function setUsername(string $username): void { $this->username = $username; }
     public function setEmail(string $email): void { $this->email = $email; }
@@ -224,7 +225,6 @@ class User {
         ];
     }
 
-    // Getters
     public function getId(): ?int { return $this->id; }
     public function getUsername(): ?string { return $this->username; }
     public function getEmail(): ?string { return $this->email; }
@@ -232,7 +232,6 @@ class User {
     public function isStudent(): bool { return $this->isStudent; }
     public function getRegion(): ?string { return $this->region; }
     public function getScore(): float { return $this->score; }
-    public function verifyPassword(string $password): bool {
-        return password_verify($password, $this->password);
-    }
+    public function verifyPassword(string $password): bool { return password_verify($password, $this->password); }
+    public function getBalance(): float { return $this->balance;}
 }
