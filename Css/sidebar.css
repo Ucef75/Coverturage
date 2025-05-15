@@ -1,3 +1,13 @@
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --success: #2ecc71;
+    --text: #333;
+    --text-light: #7f8c8d;
+}
 .sidebar {
     width: var(--sidebar-width);
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);

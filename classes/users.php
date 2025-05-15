@@ -198,7 +198,7 @@ class User {
     }
     public function saveProfilePicture(): bool {
         $stmt = $this->db->prepare("UPDATE users SET picture = ? WHERE id = ?");
-        return $stmt->execute([$this->profilePicture, $this->id]);
+        return $stmt->execute([$this->picture, $this->id]);
     }
     
 

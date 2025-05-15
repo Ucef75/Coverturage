@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $errors[] = "You must confirm account deletion";
         }
-    } } elseif (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+    } }elseif (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
         $allowed = [
             'image/jpeg' => 'jpg',
             'image/png' => 'png',
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (!isset($allowed[$fileType])) {
             $errors[] = "Invalid file type";
-        } elseif ($fileSize > 2 * 1024 * 1024) {
+        } elseif ($fileSize > 2 * 1024 * 1024) {  // 2MB limit
             $errors[] = "File too large (max 2MB)";
         } else {
             $uploadDir = '../src/';
@@ -115,13 +115,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!file_exists($targetPath)) {
                     $errors[] = "File upload failed";
                 } else {
+                    // Update user's profile picture path in the database
                     $currentUser->setProfilePicture($filename);
                     if (!$currentUser->saveProfilePicture()) {
                         $errors[] = "Database update failed";
-                        unlink($targetPath); // Clean up
+                        unlink($targetPath); // Clean up in case of failure
                     } else {
                         $success = "Profile picture updated!";
-                        refreshUserInSession($currentUser);
+                        refreshUserInSession($currentUser);  // Optionally, refresh session to reflect the update
                     }
                 }
             } else {
@@ -129,7 +130,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-
+    
+    
 ?>
 
 <!DOCTYPE html>
@@ -193,6 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="profile-picture-input">
     </div>
 </div>
+
                         
                         <button type="submit" name="update_profile" class="btn btn-success">
                             <i class="fas fa-save"></i> Save Changes
